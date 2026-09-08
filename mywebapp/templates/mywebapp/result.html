@@ -1,0 +1,95 @@
+{% extends "mywebapp/base.html" %}
+{% block content %}
+<section class="max-w-2xl mx-auto w-full px-6 py-12">
+
+  {% if patient.result == "STROKE" %}
+    <div class="rounded-2xl border border-rose-200 bg-rose-50/50 p-8 text-center shadow-sm shadow-rose-50">
+      <span class="inline-flex h-14 w-14 items-center justify-center rounded-full bg-rose-500 text-white font-display font-bold text-2xl mb-4 shadow-md shadow-rose-200">!</span>
+      <h1 class="font-display font-bold text-2xl text-rose-600">มีแนวโน้มเป็น Stroke</h1>
+      <p class="text-sm text-slate-500 mt-2">ผู้ป่วยรหัส <span class="text-slate-800 font-semibold">#{{ patient.patient_id }}</span> ควรได้รับการส่งต่อและเตรียมความพร้อมในการรักษาทันที</p>
+    </div>
+  {% else %}
+    <div class="rounded-2xl border border-emerald-200 bg-emerald-50/50 p-8 text-center shadow-sm shadow-emerald-50">
+      <span class="inline-flex h-14 w-14 items-center justify-center rounded-full bg-emerald-500 text-white font-display font-bold text-2xl mb-4 shadow-md shadow-emerald-200">✓</span>
+      <h1 class="font-display font-bold text-2xl text-emerald-600">Non-Stroke</h1>
+      <p class="text-sm text-slate-500 mt-2">ผู้ป่วยรหัส <span class="text-slate-800 font-semibold">#{{ patient.patient_id }}</span> ไม่พบแนวโน้มของโรคหลอดเลือดสมองในเบื้องต้น</p>
+    </div>
+  {% endif %}
+
+  <!-- คำแนะนำ -->
+  <div class="bg-white rounded-2xl border border-slate-100 p-6 mt-6 custom-shadow">
+    <p class="font-display font-semibold text-sm text-sky-600 mb-3 flex items-center gap-1.5">💡 คำแนะนำในการเตรียมตัวรับมือเบื้องต้น</p>
+    <div class="text-sm text-slate-600 leading-relaxed bg-slate-50 p-4 rounded-xl border border-slate-100 whitespace-pre-line">
+      {% if recommendation %}
+        {{ recommendation.content }}
+      {% else %}
+        ยังไม่มีคำแนะนำสำหรับผลลัพธ์นี้ในระบบ
+      {% endif %}
+    </div>
+  </div>
+
+  <!-- สรุปอาการ FAST -->
+  <div class="bg-white rounded-2xl border border-slate-100 p-6 mt-6 custom-shadow">
+    <p class="font-display font-semibold text-sm text-slate-800 mb-4">สรุปบันทึกอาการตามเกณฑ์ FAST</p>
+    <div class="grid grid-cols-3 gap-3 text-center">
+      <div class="rounded-xl p-3 border {% if patient.f_face == 'Y' %}bg-rose-50/60 text-rose-600 border-rose-100 font-semibold{% else %}bg-slate-50/60 text-slate-400 border-slate-100{% endif %}">
+        <p class="font-display font-bold text-lg">F</p>
+        <p class="text-xs mt-1">{% if patient.f_face == 'Y' %}พบอาการ{% else %}ไม่พบ{% endif %}</p>
+      </div>
+      <div class="rounded-xl p-3 border {% if patient.a_arm == 'Y' %}bg-rose-50/60 text-rose-600 border-rose-100 font-semibold{% else %}bg-slate-50/60 text-slate-400 border-slate-100{% endif %}">
+        <p class="font-display font-bold text-lg">A</p>
+        <p class="text-xs mt-1">{% if patient.a_arm == 'Y' %}พบอาการ{% else %}ไม่พบ{% endif %}</p>
+      </div>
+      <div class="rounded-xl p-3 border {% if patient.s_speech == 'Y' %}bg-rose-50/60 text-rose-600 border-rose-100 font-semibold{% else %}bg-slate-50/60 text-slate-400 border-slate-100{% endif %}">
+        <p class="font-display font-bold text-lg">S</p>
+        <p class="text-xs mt-1">{% if patient.s_speech == 'Y' %}พบอาการ{% else %}ไม่พบ{% endif %}</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ข้อมูลที่ใช้ประเมิน -->
+  <div class="bg-white rounded-2xl border border-slate-100 p-6 mt-6 custom-shadow">
+    <p class="font-display font-semibold text-sm text-slate-800 mb-4">ข้อมูลที่ใช้ในการประเมิน</p>
+    <dl class="grid sm:grid-cols-2 gap-x-6 gap-y-3 text-sm">
+      <div class="flex justify-between border-b border-slate-50 pb-2">
+        <dt class="text-slate-400">เพศ</dt>
+        <dd class="text-slate-700 font-medium">{{ patient.get_gender_display }}</dd>
+      </div>
+      <div class="flex justify-between border-b border-slate-50 pb-2">
+        <dt class="text-slate-400">อายุ</dt>
+        <dd class="text-slate-700 font-medium">{{ patient.age }} ปี</dd>
+      </div>
+      <div class="flex justify-between border-b border-slate-50 pb-2">
+        <dt class="text-slate-400">กลุ่มอายุ</dt>
+        <dd class="text-slate-700 font-medium">{{ patient.get_age_group_display }}</dd>
+      </div>
+      <div class="flex justify-between border-b border-slate-50 pb-2">
+        <dt class="text-slate-400">ประเภทผู้ป่วย</dt>
+        <dd class="text-slate-700 font-medium">{{ patient.get_patient_type_display }}</dd>
+      </div>
+      <div class="flex justify-between border-b border-slate-50 pb-2 sm:col-span-2">
+        <dt class="text-slate-400">สาเหตุการส่งต่อ</dt>
+        <dd class="text-slate-700 font-medium">{{ patient.get_referral_reason_display }}</dd>
+      </div>
+    </dl>
+  </div>
+
+  <!-- Disclaimer -->
+  <div class="rounded-xl border border-amber-200 bg-amber-50/60 px-4 py-3 mt-6">
+    <p class="text-xs text-amber-800 leading-relaxed">
+      <span class="font-semibold">ข้อควรทราบ</span> —
+      ผลการจำแนกนี้เป็นเพียงเครื่องมือช่วยคัดกรองเบื้องต้นจากแบบจำลอง Machine Learning
+      ไม่ใช่การวินิจฉัยทางการแพทย์ การตัดสินใจขั้นสุดท้ายเป็นดุลยพินิจของแพทย์ผู้เชี่ยวชาญ
+    </p>
+  </div>
+
+  <div class="flex flex-col sm:flex-row gap-3 mt-8">
+    <a href="{% url 'dashboard' %}" class="flex-1 text-center bg-sky-600 text-white py-3 rounded-xl text-sm font-semibold hover:bg-sky-700 transition shadow-md shadow-sky-100">
+      ➕ ประเมินผู้ป่วยรายถัดไป
+    </a>
+    <a href="{% url 'history' %}" class="flex-1 text-center border border-slate-200 bg-white text-slate-600 py-3 rounded-xl text-sm font-semibold hover:bg-slate-50 transition">
+      ดูประวัติทั้งหมด
+    </a>
+  </div>
+</section>
+{% endblock %}
