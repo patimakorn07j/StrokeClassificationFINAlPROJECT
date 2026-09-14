@@ -2,18 +2,28 @@
 {% block content %}
 <section class="max-w-3xl mx-auto w-full px-6 py-12">
   <div class="mb-8">
-    <h1 class="font-display font-bold text-3xl text-slate-800">ประเมินผู้ป่วยใหม่</h1>
-    <p class="text-sm text-slate-500 mt-1.5">กรอกข้อมูลผู้ป่วยและสังเกตอาการตามเกณฑ์ FAST เพื่อประมวลผลความเสี่ยงเบื้องต้น</p>
+    <a href="{% url 'dashboard' %}" class="inline-flex items-center gap-1.5 text-sm text-slate-500 hover:text-sky-600 transition font-medium mb-3">
+      ← เปลี่ยนผู้ป่วย
+    </a>
+    <h1 class="font-bold text-3xl text-slate-800">ประเมินอาการผู้ป่วย</h1>
+    <p class="text-sm text-slate-500 mt-1.5">
+      ผู้ป่วย: <span class="font-semibold text-slate-700">{{ patient.full_name }}</span>
+      · รหัส <span class="font-semibold text-slate-700">{{ patient.hn }}</span>
+    </p>
+    {% if previous_count > 0 %}
+      <p class="text-xs text-amber-600 bg-amber-50 border border-amber-200 rounded-lg px-3 py-1.5 mt-2 inline-block">
+        ⓘ ผู้ป่วยรายนี้เคยได้รับการประเมินมาแล้ว {{ previous_count }} ครั้ง
+      </p>
+    {% endif %}
   </div>
 
   <form method="post" class="space-y-6" id="patient-form">
     {% csrf_token %}
 
-    <!-- ข้อมูลทั่วไป -->
     <div class="bg-white rounded-2xl border-2 border-slate-200 p-6 shadow-sm">
       <div class="flex items-center gap-2 mb-5 border-b-2 border-slate-100 pb-3">
         <span class="h-2.5 w-2.5 rounded-full bg-sky-500"></span>
-        <p class="font-display font-semibold text-base text-slate-800">ข้อมูลทั่วไปของผู้ป่วย</p>
+        <p class="font-semibold text-base text-slate-800">ข้อมูลทั่วไปของผู้ป่วย</p>
       </div>
       <div class="grid sm:grid-cols-2 gap-5">
         <div>
@@ -47,17 +57,15 @@
       </div>
     </div>
 
-    <!-- เกณฑ์ FAST -->
     <div class="bg-white rounded-2xl border-2 border-slate-200 p-6 shadow-sm">
       <div class="flex items-center justify-between mb-1 border-b-2 border-slate-100 pb-3">
         <div class="flex items-center gap-2">
           <span class="h-2.5 w-2.5 rounded-full bg-rose-500"></span>
-          <p class="font-display font-semibold text-base text-slate-800">เกณฑ์ประเมินอาการ FAST</p>
+          <p class="font-semibold text-base text-slate-800">เกณฑ์ประเมินอาการ FAST</p>
         </div>
         <span class="text-xs text-slate-500 bg-slate-100 px-2.5 py-1 rounded-md font-medium">คลิกเลือกข้อที่ตรวจพบ</span>
       </div>
 
-      <!-- hidden inputs -->
       {{ form.f_face }}
       {{ form.a_arm }}
       {{ form.s_speech }}
@@ -65,35 +73,32 @@
       <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 mt-4">
         <div class="fast-card rounded-xl border-2 border-slate-200 p-4 text-center bg-white cursor-pointer transition-all duration-200 shadow-sm hover:border-slate-300 hover:bg-slate-50"
              data-target="{{ form.f_face.id_for_label }}">
-          <span class="fast-letter font-display font-bold text-2xl text-slate-400 inline-block transition">F</span>
+          <span class="fast-letter font-bold text-2xl text-slate-400 inline-block transition">F</span>
           <p class="text-xs font-medium text-slate-600 mt-1">หน้าเบี้ยว</p>
           <p class="fast-status text-[10px] text-slate-400 mt-1 font-medium">ไม่พบอาการ</p>
         </div>
-
         <div class="fast-card rounded-xl border-2 border-slate-200 p-4 text-center bg-white cursor-pointer transition-all duration-200 shadow-sm hover:border-slate-300 hover:bg-slate-50"
              data-target="{{ form.a_arm.id_for_label }}">
-          <span class="fast-letter font-display font-bold text-2xl text-slate-400 inline-block transition">A</span>
+          <span class="fast-letter font-bold text-2xl text-slate-400 inline-block transition">A</span>
           <p class="text-xs font-medium text-slate-600 mt-1">แขนขาอ่อนแรง</p>
           <p class="fast-status text-[10px] text-slate-400 mt-1 font-medium">ไม่พบอาการ</p>
         </div>
-
         <div class="fast-card rounded-xl border-2 border-slate-200 p-4 text-center bg-white cursor-pointer transition-all duration-200 shadow-sm hover:border-slate-300 hover:bg-slate-50"
              data-target="{{ form.s_speech.id_for_label }}">
-          <span class="fast-letter font-display font-bold text-2xl text-slate-400 inline-block transition">S</span>
+          <span class="fast-letter font-bold text-2xl text-slate-400 inline-block transition">S</span>
           <p class="text-xs font-medium text-slate-600 mt-1">พูดไม่ชัด</p>
           <p class="fast-status text-[10px] text-slate-400 mt-1 font-medium">ไม่พบอาการ</p>
         </div>
       </div>
 
       <p class="text-xs text-slate-500 mt-4 bg-slate-50 border border-slate-200 rounded-lg px-3 py-2.5 leading-relaxed">
-        หมายเหตุ: ระบบใช้เฉพาะอาการ F, A และ S ในการจำแนก
-        เนื่องจากผลการคัดเลือกคุณลักษณะด้วย Information Gain พบว่าปัจจัยด้านเวลา (T)
-        ไม่ส่งผลต่อการจำแนกในชุดข้อมูลนี้
+        หมายเหตุ: ระบบใช้เฉพาะอาการ F, A และ S ในการจำแนก เนื่องจากผลการคัดเลือกคุณลักษณะด้วย
+        Information Gain พบว่าปัจจัยด้านเวลา (T) ไม่ส่งผลต่อการจำแนกในชุดข้อมูลนี้
       </p>
     </div>
 
     <button type="submit"
-      class="w-full bg-sky-600 text-white py-3.5 rounded-xl text-sm font-semibold hover:bg-sky-700 transition shadow-md shadow-sky-200 flex items-center justify-center gap-2">
+      class="w-full bg-sky-600 text-white py-3.5 rounded-xl text-sm font-semibold hover:bg-sky-700 transition shadow-md shadow-sky-200">
       ⚡ ประมวลผลและจำแนกโรค
     </button>
   </form>
@@ -101,27 +106,13 @@
 
 <style>
   select, input[type="number"] {
-    width: 100%;
-    border: 2px solid #cbd5e1;
-    border-radius: 0.75rem;
-    padding: 0.65rem 0.85rem;
-    font-size: 0.875rem;
-    outline: none;
-    background-color: #fff;
-    color: #334155;
-    transition: all 0.15s;
+    width: 100%; border: 2px solid #cbd5e1; border-radius: 0.75rem;
+    padding: 0.65rem 0.85rem; font-size: 1rem; outline: none;
+    background-color: #fff; color: #334155; transition: all 0.15s;
   }
-  select:hover, input[type="number"]:hover {
-    border-color: #94a3b8;
-  }
-  select:focus, input:focus {
-    border-color: #0ea5e9;
-    box-shadow: 0 0 0 4px rgba(14, 165, 233, 0.12);
-  }
-  .fast-card.active {
-    border-color: #ef4444;
-    background-color: #fef2f2;
-  }
+  select:hover, input[type="number"]:hover { border-color: #94a3b8; }
+  select:focus, input:focus { border-color: #0ea5e9; box-shadow: 0 0 0 4px rgba(14,165,233,0.12); }
+  .fast-card.active { border-color: #ef4444; background-color: #fef2f2; }
   .fast-card.active .fast-letter { color: #ef4444; }
   .fast-card.active .fast-status { color: #ef4444; font-weight: 700; }
 </style>
@@ -130,13 +121,8 @@
 document.querySelectorAll('.fast-card').forEach(card => {
   const input  = document.getElementById(card.dataset.target);
   const status = card.querySelector('.fast-status');
-
   if (!input.value) input.value = 'N';
-  if (input.value === 'Y') {
-    card.classList.add('active');
-    status.textContent = 'พบอาการ';
-  }
-
+  if (input.value === 'Y') { card.classList.add('active'); status.textContent = 'พบอาการ'; }
   card.addEventListener('click', () => {
     const isActive = card.classList.toggle('active');
     input.value = isActive ? 'Y' : 'N';

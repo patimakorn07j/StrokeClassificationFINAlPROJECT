@@ -1,0 +1,56 @@
+{% extends "mywebapp/base.html" %}
+{% block content %}
+<section class="max-w-2xl mx-auto w-full px-6 py-12">
+  <div class="mb-8">
+    <h1 class="font-bold text-3xl text-slate-800">ประเมินผู้ป่วยใหม่</h1>
+    <p class="text-sm text-slate-500 mt-1.5">ค้นหาผู้ป่วยที่เคยประเมินแล้ว หรือเพิ่มผู้ป่วยใหม่เข้าระบบ</p>
+  </div>
+
+  <!-- ค้นหาผู้ป่วย -->
+  <div class="bg-white rounded-2xl border-2 border-slate-200 p-6 shadow-sm">
+    <p class="font-semibold text-base text-slate-800 mb-4">🔍 ค้นหาผู้ป่วยที่มีอยู่แล้ว</p>
+    <form method="get" class="flex gap-3">
+      <input type="text" name="q" value="{{ query }}" placeholder="ค้นหาด้วยชื่อผู้ป่วย หรือ รหัส HN"
+             class="flex-1 rounded-xl border-2 border-slate-300 px-4 py-2.5 text-sm outline-none focus:border-sky-500">
+      <button type="submit" class="bg-slate-800 text-white px-5 py-2.5 rounded-xl text-sm font-semibold hover:bg-slate-900 transition">
+        ค้นหา
+      </button>
+    </form>
+
+    {% if results is not None %}
+      <div class="mt-5 space-y-2">
+        {% for p in results %}
+          <div class="flex items-center justify-between border-2 border-slate-200 rounded-xl px-4 py-3">
+            <div>
+              <p class="font-semibold text-slate-800 text-sm">{{ p.full_name }}</p>
+              <p class="text-xs text-slate-400 mt-0.5">{{ p.hn }} · เคยประเมินแล้ว {{ p.record_count }} ครั้ง</p>
+            </div>
+            <a href="{% url 'assess' p.patient_id %}"
+               class="bg-sky-600 text-white px-4 py-2 rounded-lg text-xs font-semibold hover:bg-sky-700 transition">
+              ประเมินผู้ป่วยนี้
+            </a>
+          </div>
+        {% empty %}
+          <p class="text-sm text-slate-400 text-center py-4">ไม่พบผู้ป่วยที่ตรงกับคำค้นหา</p>
+        {% endfor %}
+      </div>
+    {% endif %}
+  </div>
+
+  <!-- เพิ่มผู้ป่วยใหม่ -->
+  <div class="bg-white rounded-2xl border-2 border-slate-200 p-6 shadow-sm mt-6">
+    <p class="font-semibold text-base text-slate-800 mb-4">➕ เพิ่มผู้ป่วยใหม่</p>
+    <form method="post" action="{% url 'patient_create' %}" class="flex gap-3">
+      {% csrf_token %}
+      <input type="text" name="full_name" placeholder="ชื่อ-นามสกุลผู้ป่วย" required
+             class="flex-1 rounded-xl border-2 border-slate-300 px-4 py-2.5 text-sm outline-none focus:border-sky-500">
+      <button type="submit" class="bg-emerald-600 text-white px-5 py-2.5 rounded-xl text-sm font-semibold hover:bg-emerald-700 transition">
+        เพิ่มผู้ป่วย
+      </button>
+    </form>
+    <p class="text-xs text-slate-400 mt-3">
+      ระบบจะสร้างรหัส HN ให้อัตโนมัติ และตรวจสอบชื่อซ้ำก่อนบันทึกเพื่อป้องกันข้อมูลซ้ำซ้อน
+    </p>
+  </div>
+</section>
+{% endblock %}

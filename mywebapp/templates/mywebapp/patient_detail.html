@@ -10,122 +10,119 @@
 
   <div class="mb-8 flex items-start justify-between gap-4">
     <div>
-      <h1 class="font-display font-bold text-3xl text-slate-800">รายละเอียดการประเมิน</h1>
-      <p class="text-sm text-slate-500 mt-1.5">ผู้ป่วยรหัส #{{ patient.patient_id }} · ประเมินโดย {{ patient.staff.full_name|default:"ไม่ทราบ" }}</p>
+      <h1 class="font-bold text-3xl text-slate-800">รายละเอียดการประเมิน</h1>
+      <p class="text-sm text-slate-500 mt-1.5">
+        {{ record.patient.full_name }} · รหัส {{ record.patient.hn }}
+      </p>
+      <p class="text-xs text-slate-400 mt-0.5">ประเมินโดย {{ record.staff.full_name|default:"ไม่ทราบ" }}</p>
     </div>
-    {% if patient.result == "STROKE" %}
-      <span class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-sm font-bold bg-rose-500 text-white shadow-md shadow-rose-200 shrink-0">
-        ⚠️ Stroke
-      </span>
+    {% if record.result == "STROKE" %}
+      <span class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-sm font-bold bg-rose-500 text-white shadow-md shadow-rose-200 shrink-0">⚠️ Stroke</span>
     {% else %}
-      <span class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-sm font-bold bg-emerald-500 text-white shadow-md shadow-emerald-200 shrink-0">
-        ✓ Non-Stroke
-      </span>
+      <span class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-sm font-bold bg-emerald-500 text-white shadow-md shadow-emerald-200 shrink-0">✓ Non-Stroke</span>
     {% endif %}
   </div>
 
-  <!-- ข้อมูลทั่วไป — หัวข้ออยู่นอกกล่อง -->
   <div class="bg-white rounded-2xl border-2 border-slate-200 p-6 shadow-sm">
     <div class="flex items-center gap-2 mb-5 border-b-2 border-slate-100 pb-3">
       <span class="h-2.5 w-2.5 rounded-full bg-sky-500"></span>
-      <p class="font-display font-semibold text-base text-slate-800">ข้อมูลทั่วไปของผู้ป่วย</p>
+      <p class="font-semibold text-base text-slate-800">ข้อมูลทั่วไปของผู้ป่วย</p>
     </div>
-
-    <div class="grid sm:grid-cols-2 gap-5">
+    <div class="grid sm:grid-cols-2 gap-5 text-sm">
       <div>
-        <label class="block text-xs font-semibold text-slate-500 tracking-wider uppercase mb-1.5">เพศ</label>
-        <div class="rounded-xl border-2 border-slate-200 bg-slate-50 px-3.5 py-2.5 text-sm text-slate-800 font-medium">
-          {{ patient.get_gender_display }}
-        </div>
+        <p class="text-xs font-semibold text-slate-500 tracking-wider uppercase mb-1.5">เพศ</p>
+        <div class="rounded-xl border-2 border-slate-200 bg-white px-3.5 py-2.5 text-slate-800 font-semibold">{{ record.get_gender_display }}</div>
       </div>
-
       <div>
-        <label class="block text-xs font-semibold text-slate-500 tracking-wider uppercase mb-1.5">อายุ</label>
-        <div class="rounded-xl border-2 border-slate-200 bg-slate-50 px-3.5 py-2.5 text-sm text-slate-800 font-medium">
-          {{ patient.age }} ปี
-        </div>
+        <p class="text-xs font-semibold text-slate-500 tracking-wider uppercase mb-1.5">อายุ</p>
+        <div class="rounded-xl border-2 border-slate-200 bg-white px-3.5 py-2.5 text-slate-800 font-semibold">{{ record.age }} ปี</div>
       </div>
-
       <div>
-        <label class="block text-xs font-semibold text-slate-500 tracking-wider uppercase mb-1.5">กลุ่มอายุ</label>
-        <div class="rounded-xl border-2 border-slate-200 bg-slate-50 px-3.5 py-2.5 text-sm text-slate-800 font-medium">
-          {{ patient.get_age_group_display }}
-        </div>
+        <p class="text-xs font-semibold text-slate-500 tracking-wider uppercase mb-1.5">กลุ่มอายุ</p>
+        <div class="rounded-xl border-2 border-slate-200 bg-white px-3.5 py-2.5 text-slate-800 font-semibold">{{ record.get_age_group_display }}</div>
       </div>
-
       <div>
-        <label class="block text-xs font-semibold text-slate-500 tracking-wider uppercase mb-1.5">ประเภทผู้ป่วย</label>
-        <div class="rounded-xl border-2 border-slate-200 bg-slate-50 px-3.5 py-2.5 text-sm text-slate-800 font-medium">
-          {{ patient.get_patient_type_display }}
-        </div>
+        <p class="text-xs font-semibold text-slate-500 tracking-wider uppercase mb-1.5">ประเภทผู้ป่วย</p>
+        <div class="rounded-xl border-2 border-slate-200 bg-white px-3.5 py-2.5 text-slate-800 font-semibold">{{ record.get_patient_type_display }}</div>
       </div>
-
       <div class="sm:col-span-2">
-        <label class="block text-xs font-semibold text-slate-500 tracking-wider uppercase mb-1.5">สาเหตุการส่งต่อ</label>
-        <div class="rounded-xl border-2 border-slate-200 bg-slate-50 px-3.5 py-2.5 text-sm text-slate-800 font-medium">
-          {{ patient.get_referral_reason_display }}
-        </div>
+        <p class="text-xs font-semibold text-slate-500 tracking-wider uppercase mb-1.5">สาเหตุการส่งต่อ</p>
+        <div class="rounded-xl border-2 border-slate-200 bg-white px-3.5 py-2.5 text-slate-800 font-semibold">{{ record.get_referral_reason_display }}</div>
       </div>
-
       <div>
-        <label class="block text-xs font-semibold text-slate-500 tracking-wider uppercase mb-1.5">สถานะการส่งข้อมูลออนไลน์</label>
-        <div class="rounded-xl border-2 border-slate-200 bg-slate-50 px-3.5 py-2.5 text-sm text-slate-800 font-medium">
-          {{ patient.get_is_receive_display }}
-        </div>
+        <p class="text-xs font-semibold text-slate-500 tracking-wider uppercase mb-1.5">สถานะการส่งข้อมูลออนไลน์</p>
+        <div class="rounded-xl border-2 border-slate-200 bg-white px-3.5 py-2.5 text-slate-800 font-semibold">{{ record.get_is_receive_display }}</div>
       </div>
-
       <div>
-        <label class="block text-xs font-semibold text-slate-500 tracking-wider uppercase mb-1.5">แสดงผลใน Refer Board</label>
-        <div class="rounded-xl border-2 border-slate-200 bg-slate-50 px-3.5 py-2.5 text-sm text-slate-800 font-medium">
-          {{ patient.get_is_referboard_display }}
-        </div>
+        <p class="text-xs font-semibold text-slate-500 tracking-wider uppercase mb-1.5">แสดงผลใน Refer Board</p>
+        <div class="rounded-xl border-2 border-slate-200 bg-white px-3.5 py-2.5 text-slate-800 font-semibold">{{ record.get_is_referboard_display }}</div>
       </div>
     </div>
   </div>
 
-  <!-- FAST -->
   <div class="bg-white rounded-2xl border-2 border-slate-200 p-6 mt-6 shadow-sm">
     <div class="flex items-center gap-2 mb-5 border-b-2 border-slate-100 pb-3">
       <span class="h-2.5 w-2.5 rounded-full bg-rose-500"></span>
-      <p class="font-display font-semibold text-base text-slate-800">อาการตามเกณฑ์ FAST ที่บันทึกไว้</p>
+      <p class="font-semibold text-base text-slate-800">อาการตามเกณฑ์ FAST ที่บันทึกไว้</p>
     </div>
     <div class="grid grid-cols-3 gap-3 text-center">
-      <div class="rounded-xl p-4 border-2 {% if patient.f_face == 'Y' %}bg-rose-50 text-rose-600 border-rose-300{% else %}bg-slate-50 text-slate-400 border-slate-200{% endif %}">
-        <p class="font-display font-bold text-2xl">F</p>
-        <p class="text-xs font-medium mt-1.5">หน้าเบี้ยว</p>
-        <p class="text-xs font-semibold mt-1">{% if patient.f_face == 'Y' %}พบอาการ{% else %}ไม่พบ{% endif %}</p>
+      <div class="rounded-xl p-4 border-2 {% if record.f_face == 'Y' %}bg-rose-50 text-rose-600 border-rose-300{% else %}bg-white text-slate-400 border-slate-200{% endif %}">
+        <p class="font-bold text-2xl">F</p><p class="text-xs font-medium mt-1.5">หน้าเบี้ยว</p>
+        <p class="text-xs font-semibold mt-1">{% if record.f_face == 'Y' %}พบอาการ{% else %}ไม่พบ{% endif %}</p>
       </div>
-      <div class="rounded-xl p-4 border-2 {% if patient.a_arm == 'Y' %}bg-rose-50 text-rose-600 border-rose-300{% else %}bg-slate-50 text-slate-400 border-slate-200{% endif %}">
-        <p class="font-display font-bold text-2xl">A</p>
-        <p class="text-xs font-medium mt-1.5">แขนขาอ่อนแรง</p>
-        <p class="text-xs font-semibold mt-1">{% if patient.a_arm == 'Y' %}พบอาการ{% else %}ไม่พบ{% endif %}</p>
+      <div class="rounded-xl p-4 border-2 {% if record.a_arm == 'Y' %}bg-rose-50 text-rose-600 border-rose-300{% else %}bg-white text-slate-400 border-slate-200{% endif %}">
+        <p class="font-bold text-2xl">A</p><p class="text-xs font-medium mt-1.5">แขนขาอ่อนแรง</p>
+        <p class="text-xs font-semibold mt-1">{% if record.a_arm == 'Y' %}พบอาการ{% else %}ไม่พบ{% endif %}</p>
       </div>
-      <div class="rounded-xl p-4 border-2 {% if patient.s_speech == 'Y' %}bg-rose-50 text-rose-600 border-rose-300{% else %}bg-slate-50 text-slate-400 border-slate-200{% endif %}">
-        <p class="font-display font-bold text-2xl">S</p>
-        <p class="text-xs font-medium mt-1.5">พูดไม่ชัด</p>
-        <p class="text-xs font-semibold mt-1">{% if patient.s_speech == 'Y' %}พบอาการ{% else %}ไม่พบ{% endif %}</p>
+      <div class="rounded-xl p-4 border-2 {% if record.s_speech == 'Y' %}bg-rose-50 text-rose-600 border-rose-300{% else %}bg-white text-slate-400 border-slate-200{% endif %}">
+        <p class="font-bold text-2xl">S</p><p class="text-xs font-medium mt-1.5">พูดไม่ชัด</p>
+        <p class="text-xs font-semibold mt-1">{% if record.s_speech == 'Y' %}พบอาการ{% else %}ไม่พบ{% endif %}</p>
       </div>
     </div>
   </div>
 
-  <!-- คำแนะนำ -->
   <div class="bg-white rounded-2xl border-2 border-slate-200 p-6 mt-6 shadow-sm">
-    <p class="font-display font-semibold text-sm text-sky-700 mb-3 flex items-center gap-1.5">💡 คำแนะนำที่แสดง ณ เวลาประเมิน</p>
-    <div class="text-sm text-slate-700 leading-relaxed bg-slate-50 p-4 rounded-xl border-2 border-sky-200 whitespace-pre-line">
-      {% if recommendation %}
-        {{ recommendation.content }}
-      {% else %}
-        <span class="text-slate-400">ไม่มีคำแนะนำสำหรับผลลัพธ์นี้ในระบบ</span>
-      {% endif %}
+    <p class="font-semibold text-sm text-sky-700 mb-3 flex items-center gap-1.5">💡 คำแนะนำที่แสดง ณ เวลาประเมิน</p>
+    <div class="text-sm text-slate-700 leading-relaxed bg-white p-4 rounded-xl border-2 border-sky-200 whitespace-pre-line">
+      {% if recommendation %}{{ recommendation.content }}{% else %}<span class="text-slate-400">ไม่มีคำแนะนำสำหรับผลลัพธ์นี้ในระบบ</span>{% endif %}
     </div>
   </div>
 
   <div class="mt-6 text-xs text-slate-400 text-center font-medium">
-    บันทึกเมื่อ {{ patient.assessed_at|date:"d/m/Y เวลา H:i น." }}
+    บันทึกเมื่อ {{ record.assessed_at|date:"d/m/Y เวลา H:i น." }}
+    {% if record.updated_at != record.assessed_at %}
+      · แก้ไขล่าสุด {{ record.updated_at|date:"d/m/Y เวลา H:i น." }}
+    {% endif %}
   </div>
 
-  <div class="mt-8">
-    <a href="{% url 'history' %}" class="block text-center border-2 border-slate-300 bg-white text-slate-700 py-3 rounded-xl text-sm font-semibold hover:bg-slate-50 hover:border-slate-400 transition">
+  {% if other_records %}
+  <div class="bg-white rounded-2xl border-2 border-slate-200 p-6 mt-6 shadow-sm">
+    <p class="font-semibold text-base text-slate-800 mb-4">
+      📋 ประวัติครั้งอื่นของผู้ป่วยรายนี้ (HN {{ record.patient.hn }})
+    </p>
+    <div class="space-y-2">
+      {% for r in other_records %}
+        <a href="{% url 'patient_detail' r.record_id %}"
+           class="flex items-center justify-between border-2 border-slate-200 rounded-xl px-4 py-3 hover:bg-slate-50 transition">
+          <span class="text-sm text-slate-600">{{ r.assessed_at|date:"d/m/Y H:i" }}</span>
+          {% if r.result == "STROKE" %}
+            <span class="text-xs font-semibold text-rose-600">⚠️ Stroke</span>
+          {% else %}
+            <span class="text-xs font-semibold text-emerald-600">✓ Non-Stroke</span>
+          {% endif %}
+        </a>
+      {% endfor %}
+    </div>
+  </div>
+  {% endif %}
+
+  <div class="grid grid-cols-2 gap-3 mt-8">
+    <a href="{% url 'edit_record' record.record_id %}"
+       class="block text-center bg-amber-500 text-white py-3 rounded-xl text-sm font-semibold hover:bg-amber-600 transition shadow-sm">
+      ✏️ แก้ไขข้อมูล
+    </a>
+    <a href="{% url 'history' %}"
+       class="block text-center border-2 border-slate-300 bg-white text-slate-700 py-3 rounded-xl text-sm font-semibold hover:bg-slate-50 transition">
       กลับไปหน้าประวัติ
     </a>
   </div>

@@ -1,0 +1,125 @@
+{% extends "mywebapp/base.html" %}
+{% block content %}
+<section class="max-w-3xl mx-auto w-full px-6 py-12">
+  <div class="mb-8">
+    <a href="{% url 'patient_detail' record.record_id %}" class="inline-flex items-center gap-1.5 text-sm text-slate-500 hover:text-sky-600 transition font-medium mb-3">
+      ← ยกเลิกการแก้ไข
+    </a>
+    <h1 class="font-bold text-3xl text-slate-800">แก้ไขข้อมูลการประเมิน</h1>
+    <p class="text-sm text-slate-500 mt-1.5">
+      ผู้ป่วย: <span class="font-semibold text-slate-700">{{ record.patient.full_name }}</span>
+      · รหัส <span class="font-semibold text-slate-700">{{ record.patient.hn }}</span>
+    </p>
+  </div>
+
+  <div class="rounded-xl border-2 border-amber-200 bg-amber-50 px-4 py-3 mb-6">
+    <p class="text-xs text-amber-800 leading-relaxed">
+      <span class="font-semibold">หมายเหตุ</span> — เมื่อบันทึกการแก้ไข ระบบจะประมวลผลจำแนกโรคใหม่โดยอัตโนมัติ
+      ตามข้อมูลล่าสุดที่แก้ไข
+    </p>
+  </div>
+
+  <form method="post" class="space-y-6">
+    {% csrf_token %}
+
+    <div class="bg-white rounded-2xl border-2 border-slate-200 p-6 shadow-sm">
+      <div class="flex items-center gap-2 mb-5 border-b-2 border-slate-100 pb-3">
+        <span class="h-2.5 w-2.5 rounded-full bg-sky-500"></span>
+        <p class="font-semibold text-base text-slate-800">ข้อมูลทั่วไปของผู้ป่วย</p>
+      </div>
+      <div class="grid sm:grid-cols-2 gap-5">
+        <div>
+          <label class="block text-xs font-semibold text-slate-500 tracking-wider uppercase mb-1.5">{{ form.gender.label }}</label>
+          {{ form.gender }}
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-500 tracking-wider uppercase mb-1.5">{{ form.age.label }}</label>
+          {{ form.age }}
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-500 tracking-wider uppercase mb-1.5">{{ form.age_group.label }}</label>
+          {{ form.age_group }}
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-500 tracking-wider uppercase mb-1.5">{{ form.patient_type.label }}</label>
+          {{ form.patient_type }}
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-500 tracking-wider uppercase mb-1.5">{{ form.referral_reason.label }}</label>
+          {{ form.referral_reason }}
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-500 tracking-wider uppercase mb-1.5">{{ form.is_receive.label }}</label>
+          {{ form.is_receive }}
+        </div>
+        <div class="sm:col-span-2">
+          <label class="block text-xs font-semibold text-slate-500 tracking-wider uppercase mb-1.5">{{ form.is_referboard.label }}</label>
+          {{ form.is_referboard }}
+        </div>
+      </div>
+    </div>
+
+    <div class="bg-white rounded-2xl border-2 border-slate-200 p-6 shadow-sm">
+      <div class="flex items-center gap-2 mb-5 border-b-2 border-slate-100 pb-3">
+        <span class="h-2.5 w-2.5 rounded-full bg-rose-500"></span>
+        <p class="font-semibold text-base text-slate-800">เกณฑ์ประเมินอาการ FAST</p>
+      </div>
+
+      {{ form.f_face }}
+      {{ form.a_arm }}
+      {{ form.s_speech }}
+
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 mt-4">
+        <div class="fast-card rounded-xl border-2 border-slate-200 p-4 text-center bg-white cursor-pointer transition-all duration-200 shadow-sm"
+             data-target="{{ form.f_face.id_for_label }}">
+          <span class="fast-letter font-bold text-2xl text-slate-400 inline-block transition">F</span>
+          <p class="text-xs font-medium text-slate-600 mt-1">หน้าเบี้ยว</p>
+          <p class="fast-status text-[10px] text-slate-400 mt-1 font-medium">ไม่พบอาการ</p>
+        </div>
+        <div class="fast-card rounded-xl border-2 border-slate-200 p-4 text-center bg-white cursor-pointer transition-all duration-200 shadow-sm"
+             data-target="{{ form.a_arm.id_for_label }}">
+          <span class="fast-letter font-bold text-2xl text-slate-400 inline-block transition">A</span>
+          <p class="text-xs font-medium text-slate-600 mt-1">แขนขาอ่อนแรง</p>
+          <p class="fast-status text-[10px] text-slate-400 mt-1 font-medium">ไม่พบอาการ</p>
+        </div>
+        <div class="fast-card rounded-xl border-2 border-slate-200 p-4 text-center bg-white cursor-pointer transition-all duration-200 shadow-sm"
+             data-target="{{ form.s_speech.id_for_label }}">
+          <span class="fast-letter font-bold text-2xl text-slate-400 inline-block transition">S</span>
+          <p class="text-xs font-medium text-slate-600 mt-1">พูดไม่ชัด</p>
+          <p class="fast-status text-[10px] text-slate-400 mt-1 font-medium">ไม่พบอาการ</p>
+        </div>
+      </div>
+    </div>
+
+    <button type="submit"
+      class="w-full bg-amber-500 text-white py-3.5 rounded-xl text-sm font-semibold hover:bg-amber-600 transition shadow-md shadow-amber-200">
+      💾 บันทึกการแก้ไขและประมวลผลใหม่
+    </button>
+  </form>
+</section>
+
+<style>
+  select, input[type="number"] {
+    width: 100%; border: 2px solid #cbd5e1; border-radius: 0.75rem;
+    padding: 0.65rem 0.85rem; font-size: 1rem; outline: none;
+    background-color: #fff; color: #334155; transition: all 0.15s;
+  }
+  select:focus, input:focus { border-color: #0ea5e9; box-shadow: 0 0 0 4px rgba(14,165,233,0.12); }
+  .fast-card.active { border-color: #ef4444; background-color: #fef2f2; }
+  .fast-card.active .fast-letter { color: #ef4444; }
+  .fast-card.active .fast-status { color: #ef4444; font-weight: 700; }
+</style>
+
+<script>
+document.querySelectorAll('.fast-card').forEach(card => {
+  const input  = document.getElementById(card.dataset.target);
+  const status = card.querySelector('.fast-status');
+  if (input.value === 'Y') { card.classList.add('active'); status.textContent = 'พบอาการ'; }
+  card.addEventListener('click', () => {
+    const isActive = card.classList.toggle('active');
+    input.value = isActive ? 'Y' : 'N';
+    status.textContent = isActive ? 'พบอาการ' : 'ไม่พบอาการ';
+  });
+});
+</script>
+{% endblock %}
