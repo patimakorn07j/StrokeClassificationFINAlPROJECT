@@ -1,0 +1,14 @@
+{
+  "builds": [
+    {
+      "src": "StrokeClassification/wsgi.py",
+      "use": "@vercel/python"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/(.*)",
+      "dest": "StrokeClassification/wsgi.py"
+    }
+  ]
+}
