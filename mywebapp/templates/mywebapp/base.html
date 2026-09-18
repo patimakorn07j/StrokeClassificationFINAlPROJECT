@@ -2,49 +2,59 @@
 <html lang="th">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
 <title>{% block title %}ระบบจำแนกโรคหลอดเลือดสมอง{% endblock %}</title>
 <script src="https://cdn.tailwindcss.com"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
   :root { --ink:#1e293b; --primary:#0ea5e9; --bg:#f8fafc; }
-  * { font-family: 'Kanit', sans-serif !important; }
-  body { background-color: var(--bg); color: var(--ink); -webkit-font-smoothing: antialiased; font-size:16px; line-height:1.7; }
+  * { font-family: 'Kanit', sans-serif !important; box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
+  body { background-color: var(--bg); color: var(--ink); -webkit-font-smoothing: antialiased; font-size:16px; line-height:1.7; overflow-x: hidden; }
   .text-xs{font-size:.8rem!important} .text-sm{font-size:.95rem!important} .text-base{font-size:1.05rem!important}
   .text-lg{font-size:1.2rem!important} .text-xl{font-size:1.35rem!important} .text-2xl{font-size:1.6rem!important}
   .text-3xl{font-size:2rem!important} .text-4xl{font-size:2.5rem!important} .text-5xl{font-size:3.1rem!important}
+  @media (max-width: 640px) {
+    .text-3xl{font-size:1.6rem!important} .text-4xl{font-size:1.9rem!important}
+  }
   select,input[type="number"],input[type="text"],input[type="password"],input[type="date"]{font-size:1rem!important}
   .custom-shadow{box-shadow:0 4px 6px -1px rgb(0 0 0/.02),0 2px 4px -2px rgb(0 0 0/.02),0 0 0 1px rgb(0 0 0/.02)}
+  .form-input {
+    width: 100%; border: 2px solid #cbd5e1; border-radius: 0.75rem;
+    padding: 0.65rem 0.85rem; font-size: 1rem; outline: none;
+    background-color: #fff; color: #334155; transition: all .15s;
+  }
+  .form-input:focus { border-color: #0ea5e9; box-shadow: 0 0 0 4px rgba(14,165,233,.12); }
 </style>
 {% block extra_head %}{% endblock %}
 </head>
 <body class="min-h-screen flex flex-col bg-slate-50">
 
 <header class="bg-white border-b border-slate-100 sticky top-0 z-50 backdrop-blur-md bg-white/90">
-  <div class="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
-    <a href="{% url 'index' %}" class="flex items-center gap-3 group">
-      <span class="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-sky-500 text-white font-semibold text-lg shadow-md shadow-sky-200 group-hover:scale-105 transition duration-200">S</span>
-      <span class="font-semibold text-lg tracking-tight text-slate-800 group-hover:text-sky-600 transition duration-200">ระบบจำแนกโรคหลอดเลือดสมอง</span>
+  <div class="max-w-6xl mx-auto px-4 sm:px-6 py-3 sm:py-4 flex flex-wrap items-center justify-between gap-y-2">
+    <a href="{% url 'index' %}" class="flex items-center gap-2 sm:gap-3 group">
+      <span class="inline-flex h-8 w-8 sm:h-10 sm:w-10 items-center justify-center rounded-xl bg-sky-500 text-white font-semibold text-base sm:text-lg shadow-md shadow-sky-200 group-hover:scale-105 transition duration-200">S</span>
+      <span class="font-semibold text-sm sm:text-lg tracking-tight text-slate-800 group-hover:text-sky-600 transition duration-200">ระบบจำแนกโรคหลอดเลือดสมอง</span>
     </a>
-    <nav class="flex items-center gap-5 text-sm font-medium text-slate-600">
+    <nav class="flex items-center gap-3 sm:gap-5 text-xs sm:text-sm font-medium text-slate-600 flex-wrap">
       {% if request.session.staff_id %}
         <a href="{% url 'dashboard' %}" class="hover:text-sky-600 transition py-1">ประเมินผู้ป่วย</a>
         <a href="{% url 'history' %}" class="hover:text-sky-600 transition py-1">ประวัติ</a>
         <span class="text-slate-300 hidden sm:inline">|</span>
-        <span class="text-slate-700 bg-slate-100 px-3 py-1.5 rounded-lg text-xs font-normal hidden sm:inline-flex items-center gap-1.5">
+        <span class="text-slate-700 bg-slate-100 px-2.5 sm:px-3 py-1.5 rounded-lg text-xs font-normal hidden sm:inline-flex items-center gap-1.5">
           <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>{{ request.session.staff_name }}
         </span>
-        <a href="{% url 'logout' %}" class="rounded-xl bg-rose-50 text-rose-600 px-4 py-2 hover:bg-rose-100 transition font-semibold">ออกจากระบบ</a>
+        <a href="{% url 'logout' %}" class="rounded-xl bg-rose-50 text-rose-600 px-3 sm:px-4 py-1.5 sm:py-2 hover:bg-rose-100 transition font-semibold">ออกจากระบบ</a>
       {% else %}
-        <a href="{% url 'login' %}" class="rounded-xl bg-sky-600 text-white px-4 py-2 hover:bg-sky-700 transition shadow-sm shadow-sky-100 font-semibold">เข้าสู่ระบบ</a>
+        <a href="{% url 'login' %}" class="rounded-xl bg-sky-600 text-white px-3 sm:px-4 py-1.5 sm:py-2 hover:bg-sky-700 transition shadow-sm shadow-sky-100 font-semibold">เข้าสู่ระบบ</a>
       {% endif %}
     </nav>
   </div>
 </header>
 
 {% if messages %}
-<div class="max-w-6xl mx-auto w-full px-6 mt-6 space-y-3">
+<div class="max-w-6xl mx-auto w-full px-4 sm:px-6 mt-4 sm:mt-6 space-y-3">
   {% for message in messages %}
     <div class="rounded-xl px-4 py-3.5 text-sm font-medium border shadow-sm transition
       {% if message.tags == 'error' %} bg-red-50 text-red-700 border-red-100
@@ -58,7 +68,7 @@
 
 <main class="flex-1 flex flex-col">{% block content %}{% endblock %}</main>
 
-<footer class="border-t border-slate-200/60 py-6 text-center text-xs text-slate-400 bg-white mt-12">
+<footer class="border-t border-slate-200/60 py-6 text-center text-xs text-slate-400 bg-white mt-12 px-4">
   © ระบบจำแนกโรคหลอดเลือดสมองด้วยเทคนิคการเรียนรู้ของเครื่อง
 </footer>
 </body>

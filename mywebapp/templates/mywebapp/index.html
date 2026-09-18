@@ -1,70 +1,54 @@
 {% extends "mywebapp/base.html" %}
 {% block content %}
 
-<section class="max-w-6xl mx-auto w-full px-6 pt-12 pb-10 grid md:grid-cols-2 gap-12 items-center">
-  <div class="space-y-6">
+<section class="max-w-6xl mx-auto w-full px-4 sm:px-6 pt-8 sm:pt-12 pb-10 grid md:grid-cols-2 gap-8 sm:gap-12 items-center">
+  <div class="space-y-5 sm:space-y-6">
     <span class="inline-flex items-center text-xs font-semibold tracking-wide text-sky-600 bg-sky-50 px-3 py-1.5 rounded-full border border-sky-100">
       🩺 ระบบสนับสนุนการคัดกรองทางแพทย์เบื้องต้น
     </span>
-    <h1 class="font-display font-bold text-4xl md:text-5xl text-slate-800">
-    จำแนกโรคหลอดเลือดสมอง
-    <span class="block mt-4 text-transparent bg-clip-text bg-gradient-to-r from-sky-600 to-sky-500">
-    ได้เร็วขึ้น แม่นยำขึ้น
-    </span>
+    <h1 class="font-bold text-3xl sm:text-4xl md:text-5xl leading-tight text-slate-800">
+      จำแนกโรคหลอดเลือดสมอง<br><span class="text-sky-600">ได้เร็วขึ้น แม่นยำขึ้น</span>
     </h1>
     <p class="text-[15px] leading-relaxed text-slate-500 max-w-md">
-      กรอกข้อมูลผู้ป่วยตามเกณฑ์ FAST และข้อมูลทางสถิติทั่วไป ระบบ AI จะช่วยวิเคราะห์ความเสี่ยงแนวโน้ม Stroke / Non-Stroke เพื่อช่วยสนับสนุนบุคลากรในการเตรียมตัวรักษาได้อย่างทันท่วงที
+      กรอกข้อมูลผู้ป่วยตามเกณฑ์ FAST และข้อมูลทางสถิติทั่วไป ระบบ AI จะช่วยวิเคราะห์ความเสี่ยงแนวโน้ม Stroke / Non-Stroke
     </p>
-    <div class="pt-2">
-      <a href="{% url 'login' %}" class="inline-block bg-sky-600 text-white px-6 py-3 rounded-xl text-sm font-semibold hover:bg-sky-700 transition shadow-md shadow-sky-100">
-        เข้าสู่ระบบใช้งาน
+
+    <div class="flex flex-col sm:flex-row gap-3 pt-2">
+      <a href="{% url 'login' %}"
+         class="inline-flex items-center justify-center gap-2 bg-sky-600 text-white px-6 py-3 rounded-xl text-sm font-semibold hover:bg-sky-700 transition shadow-md shadow-sky-100">
+        👩‍⚕️ เข้าสู่ระบบเจ้าหน้าที่
       </a>
-      <p class="text-xs text-slate-400 mt-3">
-        บัญชีผู้ใช้งานจัดการโดยผู้ดูแลระบบ กรุณาติดต่อผู้ดูแลระบบเพื่อขอสิทธิ์เข้าใช้งาน
-      </p>
+      <a href="/admin/"
+         class="inline-flex items-center justify-center gap-2 bg-slate-800 text-white px-6 py-3 rounded-xl text-sm font-semibold hover:bg-slate-900 transition shadow-md shadow-slate-200">
+        🛠️ เข้าสู่ระบบผู้ดูแลระบบ
+      </a>
     </div>
+    <p class="text-xs text-slate-400">
+      บัญชีผู้ใช้งานเจ้าหน้าที่จัดการโดยผู้ดูแลระบบ กรุณาติดต่อผู้ดูแลระบบเพื่อขอสิทธิ์เข้าใช้งาน
+    </p>
   </div>
 
-  <!-- FAST Stepper Element -->
-  <div class="bg-white rounded-2xl p-7 border border-slate-100 custom-shadow">
-    <p class="font-display font-bold text-slate-800 text-base mb-1">เกณฑ์ประเมินอาการเบื้องต้น</p>
+  <div class="bg-white rounded-2xl p-6 sm:p-7 border border-slate-100 custom-shadow">
+    <p class="font-bold text-slate-800 text-base mb-1">เกณฑ์ประเมินอาการเบื้องต้น</p>
     <p class="text-xs text-slate-400 mb-6">สังเกต 4 สัญญาณอันตรายที่ต้องระวังอย่างใกล้ชิด</p>
     <div class="grid gap-4">
       <div class="flex items-center gap-4 p-3 rounded-xl hover:bg-slate-50 transition">
-        <span class="h-11 w-11 shrink-0 rounded-xl bg-rose-50 text-rose-500 font-display font-bold flex items-center justify-center text-lg border border-rose-100">F</span>
-        <div><p class="text-sm font-semibold text-slate-700">Face</p><p class="text-xs text-slate-400 mt-0.5">หน้าเบี้ยว มุมปากตก หรือยิ้มแล้วปากเบี้ยวไปข้างหนึ่ง</p></div>
+        <span class="h-11 w-11 shrink-0 rounded-xl bg-rose-50 text-rose-500 font-bold flex items-center justify-center text-lg border border-rose-100">F</span>
+        <div><p class="text-sm font-semibold text-slate-700">Face</p><p class="text-xs text-slate-400 mt-0.5">หน้าเบี้ยว มุมปากตก</p></div>
       </div>
       <div class="flex items-center gap-4 p-3 rounded-xl hover:bg-slate-50 transition">
-        <span class="h-11 w-11 shrink-0 rounded-xl bg-rose-50 text-rose-500 font-display font-bold flex items-center justify-center text-lg border border-rose-100">A</span>
-        <div><p class="text-sm font-semibold text-slate-700">Arm</p><p class="text-xs text-slate-400 mt-0.5">แขนขาอ่อนแรงข้างใดข้างหนึ่ง ยกไม่ขึ้น หรือเดินเซ</p></div>
+        <span class="h-11 w-11 shrink-0 rounded-xl bg-rose-50 text-rose-500 font-bold flex items-center justify-center text-lg border border-rose-100">A</span>
+        <div><p class="text-sm font-semibold text-slate-700">Arm</p><p class="text-xs text-slate-400 mt-0.5">แขนขาอ่อนแรงข้างใดข้างหนึ่ง</p></div>
       </div>
       <div class="flex items-center gap-4 p-3 rounded-xl hover:bg-slate-50 transition">
-        <span class="h-11 w-11 shrink-0 rounded-xl bg-rose-50 text-rose-500 font-display font-bold flex items-center justify-center text-lg border border-rose-100">S</span>
-        <div><p class="text-sm font-semibold text-slate-700">Speech</p><p class="text-xs text-slate-400 mt-0.5">พูดไม่ชัด พูดอ้อแอ้ นึกคำไม่ออก หรือฟังคนอื่นไม่เข้าใจ</p></div>
+        <span class="h-11 w-11 shrink-0 rounded-xl bg-rose-50 text-rose-500 font-bold flex items-center justify-center text-lg border border-rose-100">S</span>
+        <div><p class="text-sm font-semibold text-slate-700">Speech</p><p class="text-xs text-slate-400 mt-0.5">พูดไม่ชัด พูดอ้อแอ้</p></div>
       </div>
       <div class="flex items-center gap-4 p-3 rounded-xl hover:bg-slate-50 transition">
-        <span class="h-11 w-11 shrink-0 rounded-xl bg-sky-50 text-sky-500 font-display font-bold flex items-center justify-center text-lg border border-sky-100">T</span>
-        <div><p class="text-sm font-semibold text-slate-700">Time</p><p class="text-xs text-slate-400 mt-0.5">เริ่มมีอาการมาไม่เกิน 4.5 ชั่วโมง ต้องรีบนำส่งโรงพยาบาล</p></div>
+        <span class="h-11 w-11 shrink-0 rounded-xl bg-sky-50 text-sky-500 font-bold flex items-center justify-center text-lg border border-sky-100">T</span>
+        <div><p class="text-sm font-semibold text-slate-700">Time</p><p class="text-xs text-slate-400 mt-0.5">เริ่มมีอาการมาไม่เกิน 4.5 ชั่วโมง</p></div>
       </div>
     </div>
-  </div>
-</section>
-
-<section class="max-w-6xl mx-auto w-full px-6 py-12 grid sm:grid-cols-3 gap-5">
-  <div class="bg-white rounded-xl border border-slate-100 p-5 custom-shadow">
-    <div class="text-sky-500 text-lg mb-2">01</div>
-    <p class="font-display font-semibold text-sm text-slate-800">เข้าสู่ระบบการกรอกข้อมูล</p>
-    <p class="mt-1 text-xs leading-relaxed text-slate-400">เจ้าหน้าที่ล็อกอินเพื่อเข้าจัดการฟอร์มและบันทึกประวัติอย่างเป็นระบบ</p>
-  </div>
-  <div class="bg-white rounded-xl border border-slate-100 p-5 custom-shadow">
-    <div class="text-sky-500 text-lg mb-2">02</div>
-    <p class="font-display font-semibold text-sm text-slate-800">ประมวลผลด้วย Machine Learning</p>
-    <p class="mt-1 text-xs leading-relaxed text-slate-400">ระบบประมวลข้อมูลทันทีและวิเคราะห์ค่าแนวโน้มเพื่อประกอบการคัดกรอง</p>
-  </div>
-  <div class="bg-white rounded-xl border border-slate-100 p-5 custom-shadow">
-    <div class="text-sky-500 text-lg mb-2">03</div>
-    <p class="font-display font-semibold text-sm text-slate-800">รับคำแนะนำเบื้องต้น</p>
-    <p class="mt-1 text-xs leading-relaxed text-slate-400">ดูผลสรุปพร้อมคำสั่งปฏิบัติเพื่อเตรียมรับมือผู้ป่วยอย่างเหมาะสม</p>
   </div>
 </section>
 

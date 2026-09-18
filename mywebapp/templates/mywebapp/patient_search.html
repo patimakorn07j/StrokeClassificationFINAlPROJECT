@@ -1,17 +1,15 @@
 {% extends "mywebapp/base.html" %}
 {% block content %}
-<section class="max-w-2xl mx-auto w-full px-6 py-12">
-  <div class="mb-8">
-    <h1 class="font-bold text-3xl text-slate-800">ประเมินผู้ป่วยใหม่</h1>
-    <p class="text-sm text-slate-500 mt-1.5">ค้นหาผู้ป่วยที่เคยประเมินแล้ว หรือเพิ่มผู้ป่วยใหม่เข้าระบบ</p>
+<section class="max-w-2xl mx-auto w-full px-4 sm:px-6 py-8 sm:py-12">
+  <div class="mb-6 sm:mb-8">
+    <h1 class="font-bold text-2xl sm:text-3xl text-slate-800">ประเมินผู้ป่วย</h1>
+    <p class="text-sm text-slate-500 mt-1.5">ค้นหาผู้ป่วยที่มีอยู่แล้วเพื่อประเมิน หรือขึ้นทะเบียนผู้ป่วยใหม่</p>
   </div>
 
-  <!-- ค้นหาผู้ป่วย -->
-  <div class="bg-white rounded-2xl border-2 border-slate-200 p-6 shadow-sm">
-    <p class="font-semibold text-base text-slate-800 mb-4">🔍 ค้นหาผู้ป่วยที่มีอยู่แล้ว</p>
-    <form method="get" class="flex gap-3">
-      <input type="text" name="q" value="{{ query }}" placeholder="ค้นหาด้วยชื่อผู้ป่วย หรือ รหัส HN"
-             class="flex-1 rounded-xl border-2 border-slate-300 px-4 py-2.5 text-sm outline-none focus:border-sky-500">
+  <div class="bg-white rounded-2xl border-2 border-slate-200 p-5 sm:p-6 shadow-sm">
+    <p class="font-semibold text-base text-slate-800 mb-4">🔍 ค้นหาผู้ป่วย</p>
+    <form method="get" class="flex flex-col sm:flex-row gap-3">
+      <input type="text" name="q" value="{{ query }}" placeholder="ค้นหาด้วยชื่อผู้ป่วย หรือ รหัส HN" class="form-input flex-1">
       <button type="submit" class="bg-slate-800 text-white px-5 py-2.5 rounded-xl text-sm font-semibold hover:bg-slate-900 transition">
         ค้นหา
       </button>
@@ -20,37 +18,43 @@
     {% if results is not None %}
       <div class="mt-5 space-y-2">
         {% for p in results %}
-          <div class="flex items-center justify-between border-2 border-slate-200 rounded-xl px-4 py-3">
+          <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 border-2 border-slate-200 rounded-xl px-4 py-3">
             <div>
               <p class="font-semibold text-slate-800 text-sm">{{ p.full_name }}</p>
-              <p class="text-xs text-slate-400 mt-0.5">{{ p.hn }} · เคยประเมินแล้ว {{ p.record_count }} ครั้ง</p>
+              <p class="text-xs text-slate-400 mt-0.5">{{ p.hn }} · เคยประเมินแล้ว {{ p.records.count }} ครั้ง</p>
             </div>
             <a href="{% url 'assess' p.patient_id %}"
-               class="bg-sky-600 text-white px-4 py-2 rounded-lg text-xs font-semibold hover:bg-sky-700 transition">
-              ประเมินผู้ป่วยนี้
+               class="bg-sky-600 text-white px-4 py-2 rounded-lg text-xs font-semibold hover:bg-sky-700 transition text-center">
+              จำแนกผู้ป่วยนี้
             </a>
           </div>
         {% empty %}
           <p class="text-sm text-slate-400 text-center py-4">ไม่พบผู้ป่วยที่ตรงกับคำค้นหา</p>
         {% endfor %}
+
+        {% if not exact_match %}
+        <div class="rounded-xl border-2 border-dashed border-sky-300 bg-sky-50/50 px-4 py-4 mt-4 text-center">
+          <p class="text-sm text-sky-700 mb-2">ไม่พบชื่อนี้ในระบบ ต้องการขึ้นทะเบียนผู้ป่วยใหม่หรือไม่</p>
+          <a href="{% url 'patient_register' %}?name={{ query|urlencode }}"
+             class="inline-block bg-emerald-600 text-white px-5 py-2 rounded-lg text-xs font-semibold hover:bg-emerald-700 transition">
+            ➕ ขึ้นทะเบียนผู้ป่วยใหม่
+          </a>
+        </div>
+        {% else %}
+        <p class="text-xs text-amber-600 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2 mt-3">
+          ⓘ พบชื่อนี้ในระบบแล้ว กรุณาเลือกจากรายการด้านบนแทนการเพิ่มใหม่
+        </p>
+        {% endif %}
       </div>
     {% endif %}
   </div>
 
-  <!-- เพิ่มผู้ป่วยใหม่ -->
-  <div class="bg-white rounded-2xl border-2 border-slate-200 p-6 shadow-sm mt-6">
-    <p class="font-semibold text-base text-slate-800 mb-4">➕ เพิ่มผู้ป่วยใหม่</p>
-    <form method="post" action="{% url 'patient_create' %}" class="flex gap-3">
-      {% csrf_token %}
-      <input type="text" name="full_name" placeholder="ชื่อ-นามสกุลผู้ป่วย" required
-             class="flex-1 rounded-xl border-2 border-slate-300 px-4 py-2.5 text-sm outline-none focus:border-sky-500">
-      <button type="submit" class="bg-emerald-600 text-white px-5 py-2.5 rounded-xl text-sm font-semibold hover:bg-emerald-700 transition">
-        เพิ่มผู้ป่วย
-      </button>
-    </form>
-    <p class="text-xs text-slate-400 mt-3">
-      ระบบจะสร้างรหัส HN ให้อัตโนมัติ และตรวจสอบชื่อซ้ำก่อนบันทึกเพื่อป้องกันข้อมูลซ้ำซ้อน
-    </p>
+  {% if results is None %}
+  <div class="text-center mt-6">
+    <a href="{% url 'patient_register' %}" class="text-sm text-sky-600 hover:text-sky-700 font-semibold">
+      ➕ ขึ้นทะเบียนผู้ป่วยใหม่
+    </a>
   </div>
+  {% endif %}
 </section>
 {% endblock %}

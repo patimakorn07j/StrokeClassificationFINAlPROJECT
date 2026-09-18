@@ -15,14 +15,14 @@ class StaffAdmin(admin.ModelAdmin):
 
 @admin.register(Patient)
 class PatientAdmin(admin.ModelAdmin):
-    list_display = ("hn", "full_name", "created_at")
+    list_display = ("hn", "full_name", "gender", "age", "age_group", "created_at")
     search_fields = ("hn", "full_name")
 
 
 @admin.register(PredictionRecord)
 class PredictionRecordAdmin(admin.ModelAdmin):
-    list_display = ("record_id", "patient", "gender", "age", "result", "assessed_at", "staff")
-    list_filter = ("result", "gender", "age_group")
+    list_display = ("record_id", "patient", "result", "assessed_at", "staff")
+    list_filter = ("result",)
     search_fields = ("patient__hn", "patient__full_name")
 
 

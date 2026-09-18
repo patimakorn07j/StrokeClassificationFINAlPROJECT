@@ -1,0 +1,34 @@
+{% extends "mywebapp/base.html" %}
+{% block content %}
+<section class="max-w-md mx-auto w-full px-4 sm:px-6 py-8 sm:py-12">
+  <a href="{% url 'dashboard' %}" class="inline-flex items-center gap-1.5 text-sm text-slate-500 hover:text-sky-600 transition font-medium mb-4">
+    ← กลับไปค้นหา
+  </a>
+
+  <div class="bg-white rounded-2xl border-2 border-slate-200 p-6 shadow-sm">
+    <h1 class="font-bold text-2xl text-slate-800 mb-1">ขึ้นทะเบียนผู้ป่วยใหม่</h1>
+    <p class="text-sm text-slate-500 mb-6">กรอกชื่อและรหัส HN ของผู้ป่วยที่ขึ้นทะเบียนไว้กับโรงพยาบาล</p>
+
+    <form method="post" class="space-y-4">
+      {% csrf_token %}
+      <div>
+        <label class="block text-xs font-semibold text-slate-500 tracking-wider uppercase mb-1.5">ชื่อ-นามสกุลผู้ป่วย</label>
+        {{ form.full_name }}
+        {% if form.full_name.errors %}<p class="text-xs text-rose-500 mt-1.5">🚨 {{ form.full_name.errors.0 }}</p>{% endif %}
+      </div>
+      <div>
+        <label class="block text-xs font-semibold text-slate-500 tracking-wider uppercase mb-1.5">รหัส HN</label>
+        {{ form.hn }}
+        {% if form.hn.errors %}
+          <p class="text-xs text-rose-500 mt-1.5">🚨 {{ form.hn.errors.0 }}</p>
+        {% else %}
+          <p class="text-xs text-slate-400 mt-1.5">รูปแบบ: HN ตามด้วยตัวเลข 9 หลัก เช่น HN123456789</p>
+        {% endif %}
+      </div>
+      <button type="submit" class="w-full bg-emerald-600 text-white py-3 rounded-xl text-sm font-semibold hover:bg-emerald-700 transition shadow-md shadow-emerald-100">
+        ขึ้นทะเบียนและเริ่มประเมิน
+      </button>
+    </form>
+  </div>
+</section>
+{% endblock %}

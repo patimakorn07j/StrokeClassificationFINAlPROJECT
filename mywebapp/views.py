@@ -2,10 +2,10 @@ from functools import wraps
 
 from django.contrib import messages
 from django.shortcuts import render, redirect, get_object_or_404
-from django.db.models import Q, Count
+from django.db.models import Q
 
 from .models import Staff, Patient, PredictionRecord, Recommendation
-from .forms import LoginForm, PatientCreateForm, AssessmentForm
+from .forms import LoginForm, PatientRegisterForm, PatientDemographicForm, AssessmentForm
 from .classifier import classify_patient
 
 
@@ -52,78 +52,80 @@ def logout_view(request):
 
 
 # ---------------------------------------------------------------------------
-# ขั้นที่ 1: ค้นหาผู้ป่วยที่มีอยู่ (แสดงจำนวนครั้งที่เคยประเมินด้วย)
+# ค้นหาผู้ป่วย — พบแล้วเข้าประเมินได้เลย / ไม่พบชื่อนี้ค่อยเพิ่มใหม่
 # ---------------------------------------------------------------------------
 @login_required
 def patient_search_view(request):
-    create_form = PatientCreateForm()
-
     query = request.GET.get("q", "").strip()
     results = None
+    exact_match = False
+
     if query:
-        results = (
-            Patient.objects.filter(Q(full_name__icontains=query) | Q(hn__icontains=query))
-            .annotate(record_count=Count("records"))[:20]
-        )
+        results = Patient.objects.filter(Q(full_name__icontains=query) | Q(hn__icontains=query))[:20]
+        exact_match = any(p.full_name.strip().lower() == query.lower() for p in results)
 
     return render(request, "mywebapp/patient_search.html", {
-        "create_form": create_form, "results": results, "query": query,
+        "results": results, "query": query, "exact_match": exact_match,
     })
 
 
 # ---------------------------------------------------------------------------
-# เพิ่มผู้ป่วยใหม่ — ตรวจสอบชื่อซ้ำก่อนสร้าง ป้องกันข้อมูลซ้ำซ้อน
-# ระบบสุ่มรหัส HN ให้อัตโนมัติ (ไม่เรียงลำดับ)
+# ขึ้นทะเบียนผู้ป่วยใหม่ — ชื่อ + รหัส HN เดิมของโรงพยาบาล (2 ช่องเท่านั้น)
 # ---------------------------------------------------------------------------
 @login_required
-def patient_create_view(request):
-    if request.method != "POST":
-        return redirect("dashboard")
+def patient_register_view(request):
+    if request.method == "POST":
+        form = PatientRegisterForm(request.POST)
+        if form.is_valid():
+            patient = form.save()
+            messages.success(request, f"ขึ้นทะเบียนผู้ป่วยสำเร็จ รหัส {patient.hn}")
+            return redirect("assess", patient_id=patient.patient_id)
+    else:
+        initial_name = request.GET.get("name", "")
+        form = PatientRegisterForm(initial={"full_name": initial_name})
 
-    full_name = request.POST.get("full_name", "").strip()
-    confirmed = request.POST.get("confirm") == "1"
-
-    if not full_name:
-        messages.error(request, "กรุณากรอกชื่อ-นามสกุลผู้ป่วย")
-        return redirect("dashboard")
-
-    # ค้นหาชื่อใกล้เคียง/ซ้ำก่อนสร้างใหม่ เพื่อป้องกันข้อมูลผู้ป่วยซ้ำซ้อน
-    possible_duplicates = Patient.objects.filter(full_name__icontains=full_name).annotate(
-        record_count=Count("records"))
-
-    if possible_duplicates.exists() and not confirmed:
-        return render(request, "mywebapp/patient_confirm.html", {
-            "full_name": full_name, "duplicates": possible_duplicates,
-        })
-
-    patient = Patient.objects.create(full_name=full_name)  # hn สุ่มให้อัตโนมัติใน model.save()
-    messages.success(request, f"เพิ่มผู้ป่วยใหม่สำเร็จ รหัส {patient.hn}")
-    return redirect("assess", patient_id=patient.patient_id)
+    return render(request, "mywebapp/patient_register.html", {"form": form})
 
 
 # ---------------------------------------------------------------------------
-# ขั้นที่ 2: กรอกข้อมูลอาการเพื่อจำแนกโรค
+# ประเมินอาการ — ครั้งแรกกรอกเพศ/อายุ/กลุ่มอายุด้วย ครั้งต่อไปข้ามไปเลย
 # ---------------------------------------------------------------------------
 @login_required
 def assessment_view(request, patient_id):
     staff = get_current_staff(request)
     patient = get_object_or_404(Patient, pk=patient_id)
-    previous_count = patient.records.count()
+    first_time = not patient.has_demographics
 
     if request.method == "POST":
-        form = AssessmentForm(request.POST)
-        if form.is_valid():
-            record = form.save(commit=False)
+        assess_form = AssessmentForm(request.POST)
+        demo_form = PatientDemographicForm(request.POST, instance=patient) if first_time else None
+
+        assess_valid = assess_form.is_valid()
+        demo_valid = demo_form.is_valid() if first_time else True
+
+        if assess_valid and demo_valid:
+            if first_time:
+                demo_form.save()
+
+            combined = {
+                "gender": patient.gender,
+                "age": patient.age,
+                "age_group": patient.age_group,
+                **assess_form.cleaned_data,
+            }
+            record = assess_form.save(commit=False)
             record.patient = patient
             record.staff = staff
-            record.result = classify_patient(form.cleaned_data)
+            record.result = classify_patient(combined)
             record.save()
             return redirect("result", record_id=record.record_id)
     else:
-        form = AssessmentForm()
+        assess_form = AssessmentForm()
+        demo_form = PatientDemographicForm(instance=patient) if first_time else None
 
     return render(request, "mywebapp/assess.html", {
-        "form": form, "patient": patient, "previous_count": previous_count,
+        "assess_form": assess_form, "demo_form": demo_form,
+        "patient": patient, "first_time": first_time,
     })
 
 
@@ -135,53 +137,52 @@ def result_view(request, record_id):
 
 
 # ---------------------------------------------------------------------------
-# ประวัติ — ค้นหา/กรอง + แสดงจำนวนรวมที่พบ
+# หน้าประวัติรวม — แสดงรายชื่อผู้ป่วยทั้งหมด พร้อมจำนวนครั้งที่ประเมิน
 # ---------------------------------------------------------------------------
 @login_required
 def history_view(request):
     staff = get_current_staff(request)
-    records = PredictionRecord.objects.filter(staff=staff).select_related("patient")
-
     q = request.GET.get("q", "").strip()
-    result_filter = request.GET.get("result", "").strip()
-    date_from = request.GET.get("date_from", "").strip()
-    date_to = request.GET.get("date_to", "").strip()
 
+    patient_ids = PredictionRecord.objects.filter(staff=staff).values_list("patient_id", flat=True).distinct()
+    patients_qs = Patient.objects.filter(patient_id__in=patient_ids)
     if q:
-        records = records.filter(Q(patient__full_name__icontains=q) | Q(patient__hn__icontains=q))
-    if result_filter in ("STROKE", "NON_STROKE"):
-        records = records.filter(result=result_filter)
-    if date_from:
-        records = records.filter(assessed_at__date__gte=date_from)
-    if date_to:
-        records = records.filter(assessed_at__date__lte=date_to)
+        patients_qs = patients_qs.filter(Q(full_name__icontains=q) | Q(hn__icontains=q))
 
-    return render(request, "mywebapp/history.html", {
-        "records": records, "record_count": records.count(),
-        "q": q, "result_filter": result_filter, "date_from": date_from, "date_to": date_to,
-    })
+    rows = []
+    for p in patients_qs:
+        records = PredictionRecord.objects.filter(patient=p, staff=staff)
+        last = records.order_by("-assessed_at").first()
+        rows.append({"patient": p, "count": records.count(), "last_assessed": last.assessed_at if last else None})
+    rows.sort(key=lambda r: r["last_assessed"] or "", reverse=True)
+
+    return render(request, "mywebapp/history.html", {"rows": rows, "q": q})
+
+
+# ---------------------------------------------------------------------------
+# ประวัติของผู้ป่วยรายบุคคล — ทุกครั้งที่เคยประเมิน พร้อมลำดับ
+# ---------------------------------------------------------------------------
+@login_required
+def patient_history_view(request, patient_id):
+    staff = get_current_staff(request)
+    patient = get_object_or_404(Patient, pk=patient_id)
+
+    records = list(PredictionRecord.objects.filter(patient=patient, staff=staff).order_by("assessed_at"))
+    for i, r in enumerate(records, 1):
+        r.seq = i
+    records.reverse()
+
+    return render(request, "mywebapp/patient_history.html", {"patient": patient, "records": records})
 
 
 @login_required
-def patient_detail_view(request, record_id):
+def record_detail_view(request, record_id):
     staff = get_current_staff(request)
     record = get_object_or_404(PredictionRecord, pk=record_id, staff=staff)
     recommendation = Recommendation.objects.filter(result_type=record.result).first()
-
-    # ประวัติครั้งอื่นของผู้ป่วยรายเดียวกัน (รหัส HN เดิม)
-    other_records = (
-        PredictionRecord.objects.filter(patient=record.patient, staff=staff)
-        .exclude(record_id=record.record_id)
-    )
-
-    return render(request, "mywebapp/patient_detail.html", {
-        "record": record, "recommendation": recommendation, "other_records": other_records,
-    })
+    return render(request, "mywebapp/record_detail.html", {"record": record, "recommendation": recommendation})
 
 
-# ---------------------------------------------------------------------------
-# แก้ไขข้อมูล — กรอกผิดแล้วอยากกลับมาแก้ ประมวลผลจำแนกใหม่ทันที
-# ---------------------------------------------------------------------------
 @login_required
 def edit_record_view(request, record_id):
     staff = get_current_staff(request)
@@ -191,11 +192,34 @@ def edit_record_view(request, record_id):
         form = AssessmentForm(request.POST, instance=record)
         if form.is_valid():
             updated = form.save(commit=False)
-            updated.result = classify_patient(form.cleaned_data)
+            combined = {
+                "gender": record.patient.gender,
+                "age": record.patient.age,
+                "age_group": record.patient.age_group,
+                **form.cleaned_data,
+            }
+            updated.result = classify_patient(combined)
             updated.save()
             messages.success(request, "แก้ไขข้อมูลและประมวลผลใหม่เรียบร้อยแล้ว")
-            return redirect("patient_detail", record_id=updated.record_id)
+            return redirect("record_detail", record_id=updated.record_id)
     else:
         form = AssessmentForm(instance=record)
 
     return render(request, "mywebapp/edit_record.html", {"form": form, "record": record})
+
+
+# ---------------------------------------------------------------------------
+# ลบข้อมูลการประเมิน — ต้องกดยืนยันซ้ำก่อนลบจริง
+# ---------------------------------------------------------------------------
+@login_required
+def delete_record_view(request, record_id):
+    staff = get_current_staff(request)
+    record = get_object_or_404(PredictionRecord, pk=record_id, staff=staff)
+
+    if request.method == "POST" and request.POST.get("confirm") == "1":
+        patient_id = record.patient_id
+        record.delete()
+        messages.success(request, "ลบข้อมูลการจำแนกเรียบร้อยแล้ว")
+        return redirect("patient_history", patient_id=patient_id)
+
+    return render(request, "mywebapp/delete_confirm.html", {"record": record})

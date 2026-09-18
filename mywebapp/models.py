@@ -1,11 +1,14 @@
-import random
 from django.db import models
+from django.core.validators import RegexValidator
 from django.contrib.auth.hashers import make_password, check_password
 
 
-# ---------------------------------------------------------------------------
-# ตารางที่ 1: เจ้าหน้าที่ผู้ใช้งานระบบ
-# ---------------------------------------------------------------------------
+hn_validator = RegexValidator(
+    regex=r"^HN\d{9}$",
+    message="รหัส HN ต้องเป็นตัวอักษร HN ตามด้วยตัวเลข 9 หลัก เช่น HN123456789",
+)
+
+
 class Staff(models.Model):
     staff_id = models.AutoField(primary_key=True)
     username = models.CharField(max_length=50, unique=True)
@@ -27,28 +30,39 @@ class Staff(models.Model):
 
 
 # ---------------------------------------------------------------------------
-# ตารางที่ 2: ข้อมูลตัวบุคคลของผู้ป่วย (Master Data)
-# รหัส HN สร้างโดยระบบอัตโนมัติแบบสุ่ม (ไม่เรียงลำดับ) รูปแบบ HN + เลข 9 หลัก
-# ผู้ป่วย 1 คน มี HN เดียวตลอดไป ไม่ว่าจะถูกจำแนกกี่ครั้งก็เห็นรหัสเดิม
+# Patient — เก็บข้อมูลตัวบุคคล รวมทั้งเพศ/อายุ/กลุ่มอายุ ซึ่งไม่ถามซ้ำ
+# หลังจากกรอกครั้งแรกแล้ว รหัส HN กรอกโดยเจ้าหน้าที่เอง (ไม่ใช่ระบบสุ่มให้)
 # ---------------------------------------------------------------------------
 class Patient(models.Model):
+
+    GENDER_CHOICES = [(1, "ชาย"), (2, "หญิง")]
+
+    AGE_GROUP_CHOICES = [
+        ("Early Childhood",     "เด็ก 0-5 ปี (Early Childhood)"),
+        ("School-Age Children", "วัยเรียน 5-15 ปี (School-Age Children)"),
+        ("Workforce",           "วัยทำงาน 15-59 ปี (Workforce)"),
+        ("Elderly",             "ผู้สูงอายุ 60 ปีขึ้นไป (Elderly)"),
+    ]
+
     patient_id = models.AutoField(primary_key=True)
-    hn = models.CharField(max_length=11, unique=True, editable=False, verbose_name="รหัส HN")
+    hn = models.CharField(
+        max_length=11, unique=True, validators=[hn_validator],
+        verbose_name="รหัส HN",
+        help_text="รหัส HN ของโรงพยาบาล รูปแบบ HN ตามด้วยตัวเลข 9 หลัก",
+    )
     full_name = models.CharField(max_length=150, verbose_name="ชื่อ-นามสกุลผู้ป่วย")
+
+    # กรอกแค่ครั้งแรกที่ประเมิน ครั้งต่อไปใช้ค่าเดิมอัตโนมัติ
+    gender = models.PositiveSmallIntegerField(choices=GENDER_CHOICES, null=True, blank=True, verbose_name="เพศ")
+    age = models.PositiveSmallIntegerField(null=True, blank=True, verbose_name="อายุ")
+    age_group = models.CharField(max_length=30, choices=AGE_GROUP_CHOICES, null=True, blank=True, verbose_name="กลุ่มอายุ")
+
     created_at = models.DateTimeField(auto_now_add=True)
 
-    @staticmethod
-    def generate_hn():
-        """สุ่มรหัส HN + เลข 9 หลัก ไม่เรียงลำดับ และตรวจสอบไม่ให้ซ้ำ"""
-        while True:
-            candidate = f"HN{random.randint(0, 999999999):09d}"
-            if not Patient.objects.filter(hn=candidate).exists():
-                return candidate
-
-    def save(self, *args, **kwargs):
-        if not self.hn:
-            self.hn = Patient.generate_hn()
-        super().save(*args, **kwargs)
+    @property
+    def has_demographics(self):
+        """True ถ้าเคยกรอกเพศ/อายุ/กลุ่มอายุแล้ว (ประเมินมาแล้วอย่างน้อย 1 ครั้ง)"""
+        return self.gender is not None and self.age is not None and bool(self.age_group)
 
     def __str__(self):
         return f"{self.hn} - {self.full_name}"
@@ -59,19 +73,9 @@ class Patient(models.Model):
 
 
 # ---------------------------------------------------------------------------
-# ตารางที่ 3: ผลการประเมินแต่ละครั้ง (ใช้ 10 Features ที่คัดเลือกด้วย IG)
-# ผู้ป่วย 1 คน (Patient) มีผลการประเมินได้หลายครั้ง (One-to-Many)
+# PredictionRecord — ผลการประเมินแต่ละครั้ง เก็บเฉพาะแอตทริบิวต์ที่เปลี่ยนได้ทุกครั้ง
 # ---------------------------------------------------------------------------
 class PredictionRecord(models.Model):
-
-    GENDER_CHOICES = [(1, "ชาย"), (2, "หญิง")]
-
-    AGE_GROUP_CHOICES = [
-        ("Early Childhood",     "เด็ก 0-5 ปี (Early Childhood)"),
-        ("School-Age Children", "วัยเรียน 5-15 ปี (School-Age Children)"),
-        ("Workforce",           "วัยทำงาน 15-59 ปี (Workforce)"),
-        ("Elderly",             "ผู้สูงอายุ 60 ปีขึ้นไป (Elderly)"),
-    ]
 
     PATIENT_TYPE_CHOICES = [
         (1, "ผู้ป่วยทั่วไป"),
@@ -96,12 +100,9 @@ class PredictionRecord(models.Model):
     RESULT_CHOICES = [("STROKE", "Stroke"), ("NON_STROKE", "Non-Stroke")]
 
     record_id = models.AutoField(primary_key=True)
-    patient = models.ForeignKey(Patient, on_delete=models.PROTECT, related_name="records", verbose_name="ผู้ป่วย")
+    patient = models.ForeignKey(Patient, on_delete=models.CASCADE, related_name="records", verbose_name="ผู้ป่วย")
     staff = models.ForeignKey(Staff, on_delete=models.SET_NULL, null=True, blank=True, related_name="records")
 
-    gender = models.PositiveSmallIntegerField(choices=GENDER_CHOICES, verbose_name="เพศ")
-    age = models.PositiveSmallIntegerField(verbose_name="อายุ")
-    age_group = models.CharField(max_length=30, choices=AGE_GROUP_CHOICES, verbose_name="กลุ่มอายุ")
     patient_type = models.PositiveSmallIntegerField(choices=PATIENT_TYPE_CHOICES, verbose_name="ประเภทผู้ป่วย")
     referral_reason = models.PositiveSmallIntegerField(choices=REFERRAL_REASON_CHOICES, verbose_name="สาเหตุการส่งต่อ")
     is_receive = models.PositiveSmallIntegerField(choices=IS_RECEIVE_CHOICES, default=1, verbose_name="สถานะการส่งข้อมูลออนไลน์")
@@ -122,12 +123,8 @@ class PredictionRecord(models.Model):
         ordering = ["-assessed_at"]
 
 
-# ---------------------------------------------------------------------------
-# ตารางที่ 4: คำแนะนำในการเตรียมตัวรับมือ
-# ---------------------------------------------------------------------------
 class Recommendation(models.Model):
     RESULT_TYPE_CHOICES = [("STROKE", "Stroke"), ("NON_STROKE", "Non-Stroke")]
-
     recommendation_id = models.AutoField(primary_key=True)
     result_type = models.CharField(max_length=10, choices=RESULT_TYPE_CHOICES, unique=True)
     content = models.TextField()

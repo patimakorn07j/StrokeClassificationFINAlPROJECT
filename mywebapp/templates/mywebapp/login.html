@@ -1,8 +1,8 @@
 {% extends "mywebapp/base.html" %}
 {% block content %}
-<section class="max-w-md mx-auto w-full px-6 py-14">
-  <div class="bg-white rounded-2xl border border-slate-100 p-8 custom-shadow">
-    <h1 class="font-display font-bold text-2xl text-slate-800">เข้าสู่ระบบ</h1>
+<section class="max-w-md mx-auto w-full px-4 sm:px-6 py-10 sm:py-14">
+  <div class="bg-white rounded-2xl border-2 border-slate-200 p-6 sm:p-8 shadow-sm">
+    <h1 class="font-bold text-2xl text-slate-800">เข้าสู่ระบบ</h1>
     <p class="text-sm text-slate-400 mt-1 mb-6">สำหรับเจ้าหน้าที่และบุคลากรผู้ใช้งานระบบ</p>
 
     <form method="post" class="space-y-4">
@@ -11,38 +11,24 @@
         <div>
           <label class="block text-xs font-semibold text-slate-500 tracking-wider mb-1.5">{{ field.label }}</label>
           {{ field }}
-          {% if field.errors %}
-            <p class="text-xs text-rose-500 mt-1">🚨 {{ field.errors.0 }}</p>
-          {% endif %}
+          {% if field.errors %}<p class="text-xs text-rose-500 mt-1">🚨 {{ field.errors.0 }}</p>{% endif %}
         </div>
       {% endfor %}
-
-      <button type="submit"
-        class="w-full bg-sky-600 text-white py-3 rounded-xl text-sm font-semibold hover:bg-sky-700 transition shadow-md shadow-sky-100 mt-2">
+      <button type="submit" class="w-full bg-sky-600 text-white py-3 rounded-xl text-sm font-semibold hover:bg-sky-700 transition shadow-md shadow-sky-100 mt-2">
         เข้าสู่ระบบ
       </button>
     </form>
 
     <div class="text-xs text-slate-400 mt-6 text-center border-t border-slate-50 pt-4 leading-relaxed">
-      บัญชีผู้ใช้งานจัดการโดยผู้ดูแลระบบ<br>
-      หากยังไม่มีบัญชี กรุณาติดต่อผู้ดูแลระบบ
+      บัญชีผู้ใช้งานจัดการโดยผู้ดูแลระบบ<br>หากยังไม่มีบัญชี กรุณาติดต่อผู้ดูแลระบบ
     </div>
   </div>
 </section>
-
 <style>
   input[type="text"], input[type="password"] {
-    width: 100%; 
-    border: 1px solid #e2e8f0; 
-    border-radius: 0.75rem;
-    padding: 0.65rem 0.85rem; 
-    font-size: 0.875rem; 
-    outline: none;
-    transition: all 0.2s;
+    width: 100%; border: 2px solid #cbd5e1; border-radius: 0.75rem;
+    padding: 0.65rem 0.85rem; font-size: 1rem; outline: none; transition: all .15s;
   }
-  input:focus { 
-    border-color: #0ea5e9; 
-    box-shadow: 0 0 0 4px rgba(14, 165, 233, 0.1); 
-  }
+  input:focus { border-color: #0ea5e9; box-shadow: 0 0 0 4px rgba(14,165,233,.12); }
 </style>
 {% endblock %}

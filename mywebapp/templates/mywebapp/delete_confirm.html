@@ -1,0 +1,28 @@
+{% extends "mywebapp/base.html" %}
+{% block content %}
+<section class="max-w-md mx-auto w-full px-4 sm:px-6 py-8 sm:py-12">
+  <div class="bg-white rounded-2xl border-2 border-rose-300 p-6 sm:p-7 shadow-sm text-center">
+    <span class="inline-flex h-14 w-14 items-center justify-center rounded-full bg-rose-500 text-white font-bold text-2xl mb-4 shadow-md shadow-rose-200">!</span>
+    <h1 class="font-bold text-xl sm:text-2xl text-slate-800">ยืนยันการลบข้อมูล</h1>
+    <p class="text-sm text-slate-500 mt-3 leading-relaxed">
+      ต้องการลบผลการประเมินของ<br>
+      <span class="font-semibold text-slate-700">{{ record.patient.full_name }}</span> ({{ record.patient.hn }})<br>
+      เมื่อวันที่ {{ record.assessed_at|date:"d/m/Y H:i" }}<br>
+      ผลจำแนก: {% if record.result == "STROKE" %}<span class="text-rose-600 font-semibold">Stroke</span>{% else %}<span class="text-emerald-600 font-semibold">Non-Stroke</span>{% endif %}
+    </p>
+    <p class="text-xs text-rose-500 mt-3 font-medium">การลบครั้งนี้ไม่สามารถย้อนกลับได้</p>
+
+    <form method="post" class="mt-6 space-y-3" onsubmit="return confirm('ยืนยันอีกครั้ง — ต้องการลบข้อมูลนี้จริงหรือไม่?');">
+      {% csrf_token %}
+      <input type="hidden" name="confirm" value="1">
+      <button type="submit" class="w-full bg-rose-600 text-white py-3 rounded-xl text-sm font-semibold hover:bg-rose-700 transition shadow-md shadow-rose-100">
+        🗑️ ยืนยันการลบ
+      </button>
+      <a href="{% url 'record_detail' record.record_id %}"
+         class="block text-center border-2 border-slate-300 bg-white text-slate-700 py-3 rounded-xl text-sm font-semibold hover:bg-slate-50 transition">
+        ยกเลิก
+      </a>
+    </form>
+  </div>
+</section>
+{% endblock %}

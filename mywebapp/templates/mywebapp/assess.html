@@ -1,18 +1,17 @@
 {% extends "mywebapp/base.html" %}
 {% block content %}
-<section class="max-w-3xl mx-auto w-full px-6 py-12">
-  <div class="mb-8">
+<section class="max-w-3xl mx-auto w-full px-4 sm:px-6 py-8 sm:py-12">
+  <div class="mb-6 sm:mb-8">
     <a href="{% url 'dashboard' %}" class="inline-flex items-center gap-1.5 text-sm text-slate-500 hover:text-sky-600 transition font-medium mb-3">
       ← เปลี่ยนผู้ป่วย
     </a>
-    <h1 class="font-bold text-3xl text-slate-800">ประเมินอาการผู้ป่วย</h1>
+    <h1 class="font-bold text-2xl sm:text-3xl text-slate-800">ประเมินอาการผู้ป่วย</h1>
     <p class="text-sm text-slate-500 mt-1.5">
-      ผู้ป่วย: <span class="font-semibold text-slate-700">{{ patient.full_name }}</span>
-      · รหัส <span class="font-semibold text-slate-700">{{ patient.hn }}</span>
+      {{ patient.full_name }} · รหัส {{ patient.hn }}
     </p>
-    {% if previous_count > 0 %}
+    {% if not first_time %}
       <p class="text-xs text-amber-600 bg-amber-50 border border-amber-200 rounded-lg px-3 py-1.5 mt-2 inline-block">
-        ⓘ ผู้ป่วยรายนี้เคยได้รับการประเมินมาแล้ว {{ previous_count }} ครั้ง
+        ⓘ ใช้ข้อมูลเพศ/อายุ/กลุ่มอายุเดิม ({{ patient.get_gender_display }}, {{ patient.age }} ปี, {{ patient.get_age_group_display }})
       </p>
     {% endif %}
   </div>
@@ -20,80 +19,90 @@
   <form method="post" class="space-y-6" id="patient-form">
     {% csrf_token %}
 
-    <div class="bg-white rounded-2xl border-2 border-slate-200 p-6 shadow-sm">
+    {% if first_time %}
+    <div class="bg-white rounded-2xl border-2 border-slate-200 p-5 sm:p-6 shadow-sm">
+      <div class="flex items-center gap-2 mb-5 border-b-2 border-slate-100 pb-3">
+        <span class="h-2.5 w-2.5 rounded-full bg-purple-500"></span>
+        <p class="font-semibold text-base text-slate-800">ข้อมูลพื้นฐาน (กรอกครั้งแรกเท่านั้น)</p>
+      </div>
+      <div class="grid sm:grid-cols-3 gap-5">
+        <div>
+          <label class="block text-xs font-semibold text-slate-500 tracking-wider uppercase mb-1.5">{{ demo_form.gender.label }}</label>
+          {{ demo_form.gender }}
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-500 tracking-wider uppercase mb-1.5">{{ demo_form.age.label }}</label>
+          {{ demo_form.age }}
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-500 tracking-wider uppercase mb-1.5">{{ demo_form.age_group.label }}</label>
+          {{ demo_form.age_group }}
+        </div>
+      </div>
+    </div>
+    {% endif %}
+
+    <div class="bg-white rounded-2xl border-2 border-slate-200 p-5 sm:p-6 shadow-sm">
       <div class="flex items-center gap-2 mb-5 border-b-2 border-slate-100 pb-3">
         <span class="h-2.5 w-2.5 rounded-full bg-sky-500"></span>
-        <p class="font-semibold text-base text-slate-800">ข้อมูลทั่วไปของผู้ป่วย</p>
+        <p class="font-semibold text-base text-slate-800">ข้อมูลการรับบริการ</p>
       </div>
       <div class="grid sm:grid-cols-2 gap-5">
         <div>
-          <label class="block text-xs font-semibold text-slate-500 tracking-wider uppercase mb-1.5">{{ form.gender.label }}</label>
-          {{ form.gender }}
+          <label class="block text-xs font-semibold text-slate-500 tracking-wider uppercase mb-1.5">{{ assess_form.patient_type.label }}</label>
+          {{ assess_form.patient_type }}
         </div>
         <div>
-          <label class="block text-xs font-semibold text-slate-500 tracking-wider uppercase mb-1.5">{{ form.age.label }} (1-100 ปี)</label>
-          {{ form.age }}
+          <label class="block text-xs font-semibold text-slate-500 tracking-wider uppercase mb-1.5">{{ assess_form.referral_reason.label }}</label>
+          {{ assess_form.referral_reason }}
         </div>
         <div>
-          <label class="block text-xs font-semibold text-slate-500 tracking-wider uppercase mb-1.5">{{ form.age_group.label }}</label>
-          {{ form.age_group }}
+          <label class="block text-xs font-semibold text-slate-500 tracking-wider uppercase mb-1.5">{{ assess_form.is_receive.label }}</label>
+          {{ assess_form.is_receive }}
         </div>
         <div>
-          <label class="block text-xs font-semibold text-slate-500 tracking-wider uppercase mb-1.5">{{ form.patient_type.label }}</label>
-          {{ form.patient_type }}
-        </div>
-        <div>
-          <label class="block text-xs font-semibold text-slate-500 tracking-wider uppercase mb-1.5">{{ form.referral_reason.label }}</label>
-          {{ form.referral_reason }}
-        </div>
-        <div>
-          <label class="block text-xs font-semibold text-slate-500 tracking-wider uppercase mb-1.5">{{ form.is_receive.label }}</label>
-          {{ form.is_receive }}
-        </div>
-        <div class="sm:col-span-2">
-          <label class="block text-xs font-semibold text-slate-500 tracking-wider uppercase mb-1.5">{{ form.is_referboard.label }}</label>
-          {{ form.is_referboard }}
+          <label class="block text-xs font-semibold text-slate-500 tracking-wider uppercase mb-1.5">{{ assess_form.is_referboard.label }}</label>
+          {{ assess_form.is_referboard }}
         </div>
       </div>
     </div>
 
-    <div class="bg-white rounded-2xl border-2 border-slate-200 p-6 shadow-sm">
+    <div class="bg-white rounded-2xl border-2 border-slate-200 p-5 sm:p-6 shadow-sm">
       <div class="flex items-center justify-between mb-1 border-b-2 border-slate-100 pb-3">
         <div class="flex items-center gap-2">
           <span class="h-2.5 w-2.5 rounded-full bg-rose-500"></span>
           <p class="font-semibold text-base text-slate-800">เกณฑ์ประเมินอาการ FAST</p>
         </div>
-        <span class="text-xs text-slate-500 bg-slate-100 px-2.5 py-1 rounded-md font-medium">คลิกเลือกข้อที่ตรวจพบ</span>
+        <span class="text-xs text-slate-500 bg-slate-100 px-2.5 py-1 rounded-md font-medium">แตะเลือกข้อที่พบ</span>
       </div>
 
-      {{ form.f_face }}
-      {{ form.a_arm }}
-      {{ form.s_speech }}
+      {{ assess_form.f_face }}
+      {{ assess_form.a_arm }}
+      {{ assess_form.s_speech }}
 
-      <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 mt-4">
-        <div class="fast-card rounded-xl border-2 border-slate-200 p-4 text-center bg-white cursor-pointer transition-all duration-200 shadow-sm hover:border-slate-300 hover:bg-slate-50"
-             data-target="{{ form.f_face.id_for_label }}">
-          <span class="fast-letter font-bold text-2xl text-slate-400 inline-block transition">F</span>
+      <div class="grid grid-cols-3 gap-2 sm:gap-3 mt-4">
+        <div class="fast-card rounded-xl border-2 border-slate-200 p-3 sm:p-4 text-center bg-white cursor-pointer transition-all duration-200 shadow-sm hover:border-slate-300"
+             data-target="{{ assess_form.f_face.id_for_label }}">
+          <span class="fast-letter font-bold text-xl sm:text-2xl text-slate-400 inline-block transition">F</span>
           <p class="text-xs font-medium text-slate-600 mt-1">หน้าเบี้ยว</p>
-          <p class="fast-status text-[10px] text-slate-400 mt-1 font-medium">ไม่พบอาการ</p>
+          <p class="fast-status text-[10px] text-slate-400 mt-1 font-medium">ไม่พบ</p>
         </div>
-        <div class="fast-card rounded-xl border-2 border-slate-200 p-4 text-center bg-white cursor-pointer transition-all duration-200 shadow-sm hover:border-slate-300 hover:bg-slate-50"
-             data-target="{{ form.a_arm.id_for_label }}">
-          <span class="fast-letter font-bold text-2xl text-slate-400 inline-block transition">A</span>
-          <p class="text-xs font-medium text-slate-600 mt-1">แขนขาอ่อนแรง</p>
-          <p class="fast-status text-[10px] text-slate-400 mt-1 font-medium">ไม่พบอาการ</p>
+        <div class="fast-card rounded-xl border-2 border-slate-200 p-3 sm:p-4 text-center bg-white cursor-pointer transition-all duration-200 shadow-sm hover:border-slate-300"
+             data-target="{{ assess_form.a_arm.id_for_label }}">
+          <span class="fast-letter font-bold text-xl sm:text-2xl text-slate-400 inline-block transition">A</span>
+          <p class="text-xs font-medium text-slate-600 mt-1">แขนอ่อนแรง</p>
+          <p class="fast-status text-[10px] text-slate-400 mt-1 font-medium">ไม่พบ</p>
         </div>
-        <div class="fast-card rounded-xl border-2 border-slate-200 p-4 text-center bg-white cursor-pointer transition-all duration-200 shadow-sm hover:border-slate-300 hover:bg-slate-50"
-             data-target="{{ form.s_speech.id_for_label }}">
-          <span class="fast-letter font-bold text-2xl text-slate-400 inline-block transition">S</span>
+        <div class="fast-card rounded-xl border-2 border-slate-200 p-3 sm:p-4 text-center bg-white cursor-pointer transition-all duration-200 shadow-sm hover:border-slate-300"
+             data-target="{{ assess_form.s_speech.id_for_label }}">
+          <span class="fast-letter font-bold text-xl sm:text-2xl text-slate-400 inline-block transition">S</span>
           <p class="text-xs font-medium text-slate-600 mt-1">พูดไม่ชัด</p>
-          <p class="fast-status text-[10px] text-slate-400 mt-1 font-medium">ไม่พบอาการ</p>
+          <p class="fast-status text-[10px] text-slate-400 mt-1 font-medium">ไม่พบ</p>
         </div>
       </div>
 
       <p class="text-xs text-slate-500 mt-4 bg-slate-50 border border-slate-200 rounded-lg px-3 py-2.5 leading-relaxed">
-        หมายเหตุ: ระบบใช้เฉพาะอาการ F, A และ S ในการจำแนก เนื่องจากผลการคัดเลือกคุณลักษณะด้วย
-        Information Gain พบว่าปัจจัยด้านเวลา (T) ไม่ส่งผลต่อการจำแนกในชุดข้อมูลนี้
+        หมายเหตุ: ระบบใช้เฉพาะอาการ F, A และ S ในการจำแนก เนื่องจากปัจจัยด้านเวลา (T) ไม่มีผลต่อการจำแนกในชุดข้อมูลนี้
       </p>
     </div>
 
@@ -105,13 +114,6 @@
 </section>
 
 <style>
-  select, input[type="number"] {
-    width: 100%; border: 2px solid #cbd5e1; border-radius: 0.75rem;
-    padding: 0.65rem 0.85rem; font-size: 1rem; outline: none;
-    background-color: #fff; color: #334155; transition: all 0.15s;
-  }
-  select:hover, input[type="number"]:hover { border-color: #94a3b8; }
-  select:focus, input:focus { border-color: #0ea5e9; box-shadow: 0 0 0 4px rgba(14,165,233,0.12); }
   .fast-card.active { border-color: #ef4444; background-color: #fef2f2; }
   .fast-card.active .fast-letter { color: #ef4444; }
   .fast-card.active .fast-status { color: #ef4444; font-weight: 700; }
@@ -126,7 +128,7 @@ document.querySelectorAll('.fast-card').forEach(card => {
   card.addEventListener('click', () => {
     const isActive = card.classList.toggle('active');
     input.value = isActive ? 'Y' : 'N';
-    status.textContent = isActive ? 'พบอาการ' : 'ไม่พบอาการ';
+    status.textContent = isActive ? 'พบอาการ' : 'ไม่พบ';
   });
 });
 </script>
