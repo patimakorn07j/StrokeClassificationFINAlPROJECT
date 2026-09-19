@@ -30,5 +30,7 @@ urlpatterns = [
     path("system-admin/staff/<int:staff_id>/delete/", admin_views.admin_staff_delete_view, name="admin_staff_delete"),
 
     path("system-admin/recommendations/", admin_views.admin_recommendation_list_view, name="admin_recommendation_list"),
+    path("system-admin/recommendations/add/", admin_views.admin_recommendation_add_view, name="admin_recommendation_add"),
     path("system-admin/recommendations/<int:rec_id>/edit/", admin_views.admin_recommendation_edit_view, name="admin_recommendation_edit"),
+    path("system-admin/recommendations/<int:rec_id>/delete/", admin_views.admin_recommendation_delete_view, name="admin_recommendation_delete"),
 ]

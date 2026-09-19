@@ -5,21 +5,46 @@
     ← กลับแผงควบคุม
   </a>
 
-  <h1 class="font-bold text-2xl sm:text-3xl text-slate-800 mb-6">จัดการคำแนะนำ</h1>
+  <div class="flex flex-wrap items-center justify-between gap-3 mb-2">
+    <h1 class="font-bold text-2xl sm:text-3xl text-slate-800">จัดการคำแนะนำ</h1>
+    {% if can_add %}
+      <a href="{% url 'admin_recommendation_add' %}"
+         class="bg-sky-600 text-white px-4 py-2.5 rounded-xl text-sm font-semibold hover:bg-sky-700 transition shadow-md shadow-sky-100 shrink-0">
+        ➕ เพิ่มคำแนะนำ
+      </a>
+    {% endif %}
+  </div>
+  <p class="text-sm text-slate-400 mb-6">ระบบเก็บคำแนะนำได้ผลลัพธ์ละ 1 รายการ รวมทั้งหมด 2 รายการ</p>
+
+  {% if missing_labels %}
+  <div class="rounded-xl border-2 border-amber-200 bg-amber-50/60 px-4 py-3 mb-5">
+    <p class="text-xs text-amber-800 leading-relaxed">
+      <span class="font-semibold">ยังขาดคำแนะนำสำหรับ</span>
+      {% for label in missing_labels %}{{ label }}{% if not forloop.last %}, {% endif %}{% endfor %} —
+      เจ้าหน้าที่ที่ได้ผลลัพธ์นี้จะไม่เห็นคำแนะนำใด ๆ ในหน้าผลการประเมิน
+    </p>
+  </div>
+  {% endif %}
 
   <div class="space-y-4">
     {% for rec in recommendations %}
     <div class="bg-white rounded-2xl border-2 border-slate-200 p-5 sm:p-6 shadow-sm">
-      <div class="flex items-center justify-between mb-3">
+      <div class="flex flex-wrap items-center justify-between gap-3 mb-3">
         {% if rec.result_type == "STROKE" %}
           <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-bold bg-rose-500 text-white">⚠️ Stroke</span>
         {% else %}
           <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-bold bg-emerald-500 text-white">✓ Non-Stroke</span>
         {% endif %}
-        <a href="{% url 'admin_recommendation_edit' rec.recommendation_id %}"
-           class="bg-amber-500 text-white px-4 py-2 rounded-lg text-xs font-semibold hover:bg-amber-600 transition">
-          ✏️ แก้ไข
-        </a>
+        <div class="flex items-center gap-2">
+          <a href="{% url 'admin_recommendation_edit' rec.recommendation_id %}"
+             class="bg-amber-500 text-white px-4 py-2 rounded-lg text-xs font-semibold hover:bg-amber-600 transition">
+            ✏️ แก้ไข
+          </a>
+          <a href="{% url 'admin_recommendation_delete' rec.recommendation_id %}"
+             class="bg-rose-50 text-rose-600 border border-rose-200 px-4 py-2 rounded-lg text-xs font-semibold hover:bg-rose-100 transition">
+            🗑️ ลบ
+          </a>
+        </div>
       </div>
       <p class="text-sm text-slate-600 leading-relaxed whitespace-pre-line bg-slate-50 rounded-xl p-4 border border-slate-100">
         {{ rec.content|truncatewords:40 }}

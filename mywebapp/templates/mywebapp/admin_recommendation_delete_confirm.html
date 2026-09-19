@@ -1,0 +1,31 @@
+{% extends "mywebapp/base.html" %}
+{% block content %}
+<section class="max-w-md mx-auto w-full px-4 sm:px-6 py-8 sm:py-12">
+  <div class="bg-white rounded-2xl border-2 border-rose-300 p-6 sm:p-7 shadow-sm text-center">
+    <span class="inline-flex h-14 w-14 items-center justify-center rounded-full bg-rose-500 text-white font-bold text-2xl mb-4 shadow-md shadow-rose-200">!</span>
+    <h1 class="font-bold text-xl sm:text-2xl text-slate-800">ยืนยันการลบคำแนะนำ</h1>
+    <p class="text-sm text-slate-500 mt-3">
+      ต้องการลบคำแนะนำสำหรับ
+      <span class="font-semibold text-slate-700">{{ rec.get_result_type_display }}</span> ใช่หรือไม่
+    </p>
+    <p class="text-xs text-rose-500 mt-2 font-medium">
+      เจ้าหน้าที่ที่ได้ผลลัพธ์นี้จะไม่เห็นคำแนะนำใด ๆ ในหน้าผลการประเมิน จนกว่าจะเพิ่มกลับเข้ามาใหม่
+    </p>
+
+    <p class="text-sm text-slate-600 leading-relaxed whitespace-pre-line bg-slate-50 rounded-xl p-4 border border-slate-100 mt-5 text-left">
+      {{ rec.content|truncatewords:40 }}
+    </p>
+
+    <form method="post" class="mt-6 space-y-3" onsubmit="return confirm('ยืนยันอีกครั้ง — ต้องการลบคำแนะนำนี้จริงหรือไม่?');">
+      {% csrf_token %}
+      <input type="hidden" name="confirm" value="1">
+      <button type="submit" class="w-full bg-rose-600 text-white py-3 rounded-xl text-sm font-semibold hover:bg-rose-700 transition shadow-md shadow-rose-100">
+        ยืนยันการลบ
+      </button>
+      <a href="{% url 'admin_recommendation_list' %}" class="block text-center border-2 border-slate-300 bg-white text-slate-700 py-3 rounded-xl text-sm font-semibold hover:bg-slate-50 transition">
+        ยกเลิก
+      </a>
+    </form>
+  </div>
+</section>
+{% endblock %}

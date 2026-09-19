@@ -91,10 +91,31 @@ class StaffForm(forms.ModelForm):
 
 
 class RecommendationForm(forms.ModelForm):
-    """แก้ไขเนื้อหาคำแนะนำของผล STROKE / NON_STROKE"""
+    """
+    เพิ่ม/แก้ไขคำแนะนำ — ระบบเก็บได้ผลลัพธ์ละ 1 รายการเท่านั้น (STROKE และ NON_STROKE)
+    ตอนเพิ่มใหม่จึงเลือกได้เฉพาะประเภทที่ยังไม่มีในระบบ
+    ส่วนตอนแก้ไขจะซ่อนช่องประเภทไว้ เพราะเปลี่ยนแล้วจะไปชนกับอีกรายการหนึ่ง
+    """
     class Meta:
         model = Recommendation
-        fields = ["content"]
+        fields = ["result_type", "content"]
         widgets = {
-            "content": forms.Textarea(attrs={"class": "form-input", "rows": 8}),
+            "result_type": forms.Select(attrs={"class": "form-input"}),
+            "content":     forms.Textarea(attrs={"class": "form-input", "rows": 8}),
         }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        if self.instance.pk:
+            del self.fields["result_type"]
+        else:
+            used = set(Recommendation.objects.values_list("result_type", flat=True))
+            field = self.fields["result_type"]
+            field.choices = [("", "— เลือกประเภทผลลัพธ์ —")] + [
+                (value, label)
+                for value, label in Recommendation.RESULT_TYPE_CHOICES
+                if value not in used
+            ]
+            field.error_messages["required"] = "กรุณาเลือกประเภทผลลัพธ์"
+            # เกิดเมื่อส่งประเภทที่มีคำแนะนำอยู่แล้วเข้ามา (ไม่ได้เลือกจากรายการที่ให้ไว้)
+            field.error_messages["invalid_choice"] = "ประเภทผลลัพธ์นี้มีคำแนะนำอยู่แล้ว กรุณาเลือกประเภทที่ยังว่าง"

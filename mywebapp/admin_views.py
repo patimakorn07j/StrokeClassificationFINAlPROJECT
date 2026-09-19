@@ -119,12 +119,43 @@ def admin_staff_delete_view(request, staff_id):
 
 
 # ---------------------------------------------------------------------------
-# จัดการคำแนะนำ — แก้ไขเนื้อหา (มี 2 รายการตายตัวคือ STROKE / NON_STROKE)
+# จัดการคำแนะนำ — เพิ่ม / แก้ไข / ลบ
+# ระบบเก็บได้ผลลัพธ์ละ 1 รายการเท่านั้น (STROKE และ NON_STROKE)
+# ปุ่มเพิ่มจึงโผล่เฉพาะตอนที่ยังมีประเภทที่ว่างอยู่ เช่น เพิ่งลบไป
 # ---------------------------------------------------------------------------
+def _missing_result_types():
+    """ประเภทผลลัพธ์ที่ยังไม่มีคำแนะนำในระบบ"""
+    used = set(Recommendation.objects.values_list("result_type", flat=True))
+    return [(value, label) for value, label in Recommendation.RESULT_TYPE_CHOICES if value not in used]
+
+
 @admin_required
 def admin_recommendation_list_view(request):
-    recommendations = Recommendation.objects.all()
-    return render(request, "mywebapp/admin_recommendation_list.html", {"recommendations": recommendations})
+    # เรียงจากมากไปน้อยเพื่อให้ STROKE ซึ่งเร่งด่วนกว่าขึ้นก่อน NON_STROKE
+    recommendations = Recommendation.objects.all().order_by("-result_type")
+    missing = _missing_result_types()
+    return render(request, "mywebapp/admin_recommendation_list.html", {
+        "recommendations": recommendations,
+        "missing_labels": [label for _, label in missing],
+        "can_add": bool(missing),
+    })
+
+
+@admin_required
+def admin_recommendation_add_view(request):
+    if not _missing_result_types():
+        messages.warning(request, "มีคำแนะนำครบทั้ง Stroke และ Non-Stroke แล้ว หากต้องการเปลี่ยนเนื้อหาให้กดแก้ไข")
+        return redirect("admin_recommendation_list")
+
+    if request.method == "POST":
+        form = RecommendationForm(request.POST)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "เพิ่มคำแนะนำสำเร็จ")
+            return redirect("admin_recommendation_list")
+    else:
+        form = RecommendationForm()
+    return render(request, "mywebapp/admin_recommendation_form.html", {"form": form, "is_edit": False})
 
 
 @admin_required
@@ -138,4 +169,14 @@ def admin_recommendation_edit_view(request, rec_id):
             return redirect("admin_recommendation_list")
     else:
         form = RecommendationForm(instance=rec)
-    return render(request, "mywebapp/admin_recommendation_form.html", {"form": form, "rec": rec})
+    return render(request, "mywebapp/admin_recommendation_form.html", {"form": form, "rec": rec, "is_edit": True})
+
+
+@admin_required
+def admin_recommendation_delete_view(request, rec_id):
+    rec = get_object_or_404(Recommendation, pk=rec_id)
+    if request.method == "POST" and request.POST.get("confirm") == "1":
+        rec.delete()
+        messages.success(request, "ลบคำแนะนำเรียบร้อยแล้ว")
+        return redirect("admin_recommendation_list")
+    return render(request, "mywebapp/admin_recommendation_delete_confirm.html", {"rec": rec})
