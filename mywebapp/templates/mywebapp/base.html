@@ -12,9 +12,19 @@
   * { font-family: 'Kanit', sans-serif !important; box-sizing: border-box; }
   html { -webkit-text-size-adjust: 100%; }
   body { background-color: var(--bg); color: var(--ink); -webkit-font-smoothing: antialiased; font-size:16px; line-height:1.7; overflow-x: hidden; }
-  .text-xs{font-size:.8rem!important} .text-sm{font-size:.95rem!important} .text-base{font-size:1.05rem!important}
-  .text-lg{font-size:1.2rem!important} .text-xl{font-size:1.35rem!important} .text-2xl{font-size:1.6rem!important}
-  .text-3xl{font-size:2rem!important} .text-4xl{font-size:2.5rem!important} .text-5xl{font-size:3.1rem!important}
+  /* ขยายขนาดฟอนต์จากค่าเริ่มต้นของ Tailwind ให้อ่านง่ายขึ้น
+     สำคัญ: ต้องกำหนด line-height คู่กับ font-size เสมอ เพราะฟอนต์ไทยมีสระ
+     และวรรณยุกต์ซ้อนกันทั้งบนและล่าง (เช่น "ขึ้น" = สระอึ + ไม้โท)
+     ถ้าปล่อยให้ใช้ line-height เดิมของ Tailwind บรรทัดจะชิดจนตัวหนังสือทับกัน */
+  .text-xs  {font-size:.8rem!important;   line-height:1.6!important}
+  .text-sm  {font-size:.95rem!important;  line-height:1.65!important}
+  .text-base{font-size:1.05rem!important; line-height:1.7!important}
+  .text-lg  {font-size:1.2rem!important;  line-height:1.6!important}
+  .text-xl  {font-size:1.35rem!important; line-height:1.55!important}
+  .text-2xl {font-size:1.6rem!important;  line-height:1.5!important}
+  .text-3xl {font-size:2rem!important;    line-height:1.45!important}
+  .text-4xl {font-size:2.5rem!important;  line-height:1.4!important}
+  .text-5xl {font-size:3.1rem!important;  line-height:1.35!important}
   @media (max-width: 640px) {
     .text-3xl{font-size:1.6rem!important} .text-4xl{font-size:1.9rem!important}
   }
@@ -46,7 +56,19 @@
           <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>{{ request.session.staff_name }}
         </span>
         <a href="{% url 'logout' %}" class="rounded-xl bg-rose-50 text-rose-600 px-3 sm:px-4 py-1.5 sm:py-2 hover:bg-rose-100 transition font-semibold">ออกจากระบบ</a>
+
+      {% elif user.is_superuser %}
+        <a href="{% url 'admin_panel' %}" class="hover:text-sky-600 transition py-1">แผงผู้ดูแลระบบ</a>
+        <span class="text-slate-300 hidden sm:inline">|</span>
+        <span class="text-slate-700 bg-slate-100 px-2.5 sm:px-3 py-1.5 rounded-lg text-xs font-normal hidden sm:inline-flex items-center gap-1.5">
+          <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>{{ user.username }}
+        </span>
+        <a href="{% url 'admin_logout' %}" class="rounded-xl bg-rose-50 text-rose-600 px-3 sm:px-4 py-1.5 sm:py-2 hover:bg-rose-100 transition font-semibold">ออกจากระบบ</a>
+
       {% else %}
+        <a href="{% url 'admin_login' %}" class="inline-flex items-center gap-1.5 rounded-xl border border-slate-200 text-slate-600 px-3 sm:px-4 py-1.5 sm:py-2 hover:border-slate-300 hover:text-slate-800 hover:bg-slate-50 transition font-medium">
+          <span aria-hidden="true">🛠️</span><span class="hidden sm:inline">ผู้ดูแลระบบ</span>
+        </a>
         <a href="{% url 'login' %}" class="rounded-xl bg-sky-600 text-white px-3 sm:px-4 py-1.5 sm:py-2 hover:bg-sky-700 transition shadow-sm shadow-sky-100 font-semibold">เข้าสู่ระบบ</a>
       {% endif %}
     </nav>
