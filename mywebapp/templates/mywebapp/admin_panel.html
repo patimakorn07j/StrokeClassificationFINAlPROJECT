@@ -1,0 +1,55 @@
+{% extends "mywebapp/base.html" %}
+{% block content %}
+<section class="max-w-4xl mx-auto w-full px-4 sm:px-6 py-8 sm:py-12">
+  <div class="mb-6 sm:mb-8 flex items-center justify-between">
+    <div>
+      <h1 class="font-bold text-2xl sm:text-3xl text-slate-800">แผงควบคุมผู้ดูแลระบบ</h1>
+      <p class="text-sm text-slate-500 mt-1.5">ยินดีต้อนรับ {{ request.user.username }}</p>
+    </div>
+    <a href="{% url 'admin_logout' %}" class="rounded-xl bg-rose-50 text-rose-600 px-4 py-2 hover:bg-rose-100 transition font-semibold text-sm shrink-0">
+      ออกจากระบบ
+    </a>
+  </div>
+
+  <!-- สถิติภาพรวม -->
+  <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4 mb-8">
+    <div class="bg-white rounded-2xl border-2 border-slate-200 p-4 sm:p-5 shadow-sm text-center">
+      <p class="text-xs font-semibold text-slate-400 uppercase">เจ้าหน้าที่</p>
+      <p class="text-2xl sm:text-3xl font-bold text-slate-800 mt-2">{{ total_staff }}</p>
+    </div>
+    <div class="bg-white rounded-2xl border-2 border-slate-200 p-4 sm:p-5 shadow-sm text-center">
+      <p class="text-xs font-semibold text-slate-400 uppercase">ผู้ป่วยทั้งหมด</p>
+      <p class="text-2xl sm:text-3xl font-bold text-slate-800 mt-2">{{ total_patients }}</p>
+    </div>
+    <div class="bg-white rounded-2xl border-2 border-rose-200 p-4 sm:p-5 shadow-sm text-center">
+      <p class="text-xs font-semibold text-rose-400 uppercase">Stroke</p>
+      <p class="text-2xl sm:text-3xl font-bold text-rose-600 mt-2">{{ stroke_count }}</p>
+    </div>
+    <div class="bg-white rounded-2xl border-2 border-emerald-200 p-4 sm:p-5 shadow-sm text-center">
+      <p class="text-xs font-semibold text-emerald-500 uppercase">Non-Stroke</p>
+      <p class="text-2xl sm:text-3xl font-bold text-emerald-600 mt-2">{{ non_stroke_count }}</p>
+    </div>
+  </div>
+
+  <!-- เมนูจัดการ -->
+  <div class="grid sm:grid-cols-2 gap-4">
+    <a href="{% url 'admin_staff_list' %}"
+       class="bg-white rounded-2xl border-2 border-slate-200 p-6 shadow-sm hover:border-sky-400 hover:shadow-md transition group">
+      <div class="flex items-center gap-3 mb-2">
+        <span class="text-2xl">👥</span>
+        <p class="font-bold text-lg text-slate-800 group-hover:text-sky-600 transition">จัดการเจ้าหน้าที่</p>
+      </div>
+      <p class="text-sm text-slate-500">เพิ่ม แก้ไข หรือลบบัญชีเจ้าหน้าที่ผู้ใช้งานระบบ</p>
+    </a>
+
+    <a href="{% url 'admin_recommendation_list' %}"
+       class="bg-white rounded-2xl border-2 border-slate-200 p-6 shadow-sm hover:border-sky-400 hover:shadow-md transition group">
+      <div class="flex items-center gap-3 mb-2">
+        <span class="text-2xl">💡</span>
+        <p class="font-bold text-lg text-slate-800 group-hover:text-sky-600 transition">จัดการคำแนะนำ</p>
+      </div>
+      <p class="text-sm text-slate-500">แก้ไขคำแนะนำในการเตรียมตัวรับมือผู้ป่วยเบื้องต้น</p>
+    </a>
+  </div>
+</section>
+{% endblock %}
