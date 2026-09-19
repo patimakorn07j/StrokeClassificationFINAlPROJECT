@@ -76,9 +76,12 @@ WSGI_APPLICATION = "StrokeClassification.wsgi.application"
 # Database
 # https://docs.djangoproject.com/en/6.0/ref/settings/#databases
 
+# บน production (เช่น Vercel) ตั้ง env DATABASE_URL ชี้ไป Postgres
+# ถ้าไม่ได้ตั้งไว้ (เครื่อง dev) จะใช้ SQLite ในโฟลเดอร์โปรเจ็คแทน
 DATABASES = {
     "default": dj_database_url.config(
-        default=os.environ.get("DATABASE_URL")
+        default=os.environ.get("DATABASE_URL") or f"sqlite:///{BASE_DIR / 'db.sqlite3'}",
+        conn_max_age=600,
     )
 }
 
