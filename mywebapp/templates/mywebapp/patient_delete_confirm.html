@@ -19,7 +19,7 @@
       <div class="mt-6 space-y-3">
         <a href="{% url 'patient_edit' patient.patient_id %}{{ next_qs }}"
            class="block bg-sky-600 text-white py-3 rounded-xl text-sm font-semibold hover:bg-sky-700 transition shadow-md shadow-sky-100">
-          ✏️ แก้ไขข้อมูลผู้ป่วยแทน
+          แก้ไขข้อมูลผู้ป่วยแทน
         </a>
         <a href="{{ back_url }}"
            class="block border-2 border-slate-300 bg-white text-slate-700 py-3 rounded-xl text-sm font-semibold hover:bg-slate-50 transition">
@@ -44,7 +44,7 @@
         {% csrf_token %}
         <input type="hidden" name="confirm" value="1">
         <button type="submit" class="w-full bg-rose-600 text-white py-3 rounded-xl text-sm font-semibold hover:bg-rose-700 transition shadow-md shadow-rose-100">
-          🗑️ ยืนยันการลบ
+          ยืนยันการลบ
         </button>
         <a href="{{ back_url }}"
            class="block text-center border-2 border-slate-300 bg-white text-slate-700 py-3 rounded-xl text-sm font-semibold hover:bg-slate-50 transition">

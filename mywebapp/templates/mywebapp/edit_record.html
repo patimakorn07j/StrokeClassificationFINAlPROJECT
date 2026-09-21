@@ -2,7 +2,7 @@
 {% block content %}
 <section class="max-w-3xl mx-auto w-full px-4 sm:px-6 py-8 sm:py-12">
   <a href="{% url 'record_detail' record.record_id %}" class="inline-flex items-center gap-1.5 text-sm text-slate-500 hover:text-sky-600 transition font-medium mb-4">
-    ← ยกเลิกการแก้ไข
+    ยกเลิกการแก้ไข
   </a>
   <h1 class="font-bold text-2xl sm:text-3xl text-slate-800 mb-1">แก้ไขข้อมูลการประเมิน</h1>
   <p class="text-sm text-slate-500 mb-6">{{ record.patient.full_name }} · รหัส {{ record.patient.hn }}</p>
@@ -71,7 +71,7 @@
     </div>
 
     <button type="submit" class="w-full bg-amber-500 text-white py-3.5 rounded-xl text-sm font-semibold hover:bg-amber-600 transition shadow-md shadow-amber-200">
-      💾 บันทึกการแก้ไขและประมวลผลใหม่
+      บันทึกการแก้ไขและประมวลผลใหม่
     </button>
   </form>
 </section>
