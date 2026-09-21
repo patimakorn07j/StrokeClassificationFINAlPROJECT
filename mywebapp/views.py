@@ -4,6 +4,7 @@ from django.contrib import messages
 from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse
 from django.db.models import Q
+from django.utils.dateparse import parse_date
 
 from .models import Staff, Patient, PredictionRecord, Recommendation
 from .forms import (
@@ -233,24 +234,52 @@ def result_view(request, record_id):
 # ---------------------------------------------------------------------------
 # หน้าประวัติรวม — แสดงรายชื่อผู้ป่วยทั้งหมด พร้อมจำนวนครั้งที่ประเมิน
 # ---------------------------------------------------------------------------
+def _parse_date(value):
+    """แปลงค่าจากช่องเลือกวันที่ ถ้ารูปแบบไม่ถูกต้องหรือไม่มีวันนั้นจริงให้ถือว่าไม่ได้เลือก"""
+    try:
+        return parse_date(value.strip()) if value else None
+    except ValueError:
+        return None
+
+
 @login_required
 def history_view(request):
     staff = get_current_staff(request)
     q = request.GET.get("q", "").strip()
+    start = _parse_date(request.GET.get("start", ""))
+    end = _parse_date(request.GET.get("end", ""))
 
-    patient_ids = PredictionRecord.objects.filter(staff=staff).values_list("patient_id", flat=True).distinct()
-    patients_qs = Patient.objects.filter(patient_id__in=patient_ids)
+    # เลือกวันเริ่มหลังวันสิ้นสุด — สลับให้แทนการขึ้นข้อความผิดพลาด เพราะเจตนาคือช่วงเดียวกัน
+    if start and end and start > end:
+        start, end = end, start
+
+    records = PredictionRecord.objects.filter(staff=staff)
+    if start:
+        records = records.filter(assessed_at__date__gte=start)
+    if end:
+        records = records.filter(assessed_at__date__lte=end)
+
+    patients_qs = Patient.objects.filter(
+        patient_id__in=records.values_list("patient_id", flat=True).distinct()
+    )
     if q:
         patients_qs = patients_qs.filter(Q(full_name__icontains=q) | Q(hn__icontains=q))
 
     rows = []
     for p in patients_qs:
-        records = PredictionRecord.objects.filter(patient=p, staff=staff)
-        last = records.order_by("-assessed_at").first()
-        rows.append({"patient": p, "count": records.count(), "last_assessed": last.assessed_at if last else None})
-    rows.sort(key=lambda r: r["last_assessed"] or "", reverse=True)
+        # นับเฉพาะการประเมินที่อยู่ในช่วงวันที่ที่เลือก ตัวเลขในตารางจึงตรงกับตัวกรองเสมอ
+        in_range = records.filter(patient=p)
+        last = in_range.order_by("-assessed_at").first()
+        rows.append({"patient": p, "count": in_range.count(), "last_assessed": last.assessed_at})
+    rows.sort(key=lambda r: r["last_assessed"], reverse=True)
 
-    return render(request, "mywebapp/history.html", {"rows": rows, "q": q})
+    return render(request, "mywebapp/history.html", {
+        "rows": rows, "q": q,
+        "start": start.isoformat() if start else "",
+        "end": end.isoformat() if end else "",
+        "has_filter": bool(q or start or end),
+        "total_records": sum(r["count"] for r in rows),
+    })
 
 
 # ---------------------------------------------------------------------------

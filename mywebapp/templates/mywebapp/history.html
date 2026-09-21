@@ -6,10 +6,32 @@
     <p class="text-sm text-slate-500 mt-1.5">รายชื่อผู้ป่วยที่คุณ <span class="text-slate-700 font-medium">{{ request.session.staff_name }}</span> เคยประเมิน</p>
   </div>
 
-  <form method="get" class="bg-white rounded-2xl border-2 border-slate-200 p-4 shadow-sm mb-6 flex gap-3">
-    <input type="text" name="q" value="{{ q }}" placeholder="ค้นหาชื่อ หรือ HN" class="form-input flex-1">
-    <button type="submit" class="bg-slate-800 text-white px-5 py-2.5 rounded-xl text-sm font-semibold hover:bg-slate-900 transition">ค้นหา</button>
+  <form method="get" class="bg-white rounded-2xl border-2 border-slate-200 p-4 shadow-sm mb-6">
+    <div class="flex flex-col sm:flex-row gap-3">
+      <input type="text" name="q" value="{{ q }}" placeholder="ค้นหาชื่อ หรือ HN" class="form-input flex-1">
+      <button type="submit" class="bg-slate-800 text-white px-5 py-2.5 rounded-xl text-sm font-semibold hover:bg-slate-900 transition">ค้นหา</button>
+    </div>
+
+    <div class="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3 mt-3 pt-3 border-t-2 border-slate-100">
+      <label for="start" class="text-xs font-semibold text-slate-500 tracking-wider uppercase shrink-0">ช่วงวันที่ประเมิน</label>
+      <input type="date" id="start" name="start" value="{{ start }}" class="form-input sm:w-auto" aria-label="ตั้งแต่วันที่">
+      <span class="text-sm text-slate-400 shrink-0 text-center">ถึง</span>
+      <input type="date" id="end" name="end" value="{{ end }}" class="form-input sm:w-auto" aria-label="ถึงวันที่">
+      {% if has_filter %}
+        <a href="{% url 'history' %}" class="text-xs font-semibold text-slate-500 hover:text-sky-600 transition sm:ml-auto text-center py-2">ล้างตัวกรอง</a>
+      {% endif %}
+    </div>
   </form>
+
+  {% if has_filter %}
+    <p class="text-sm text-slate-500 mb-4">
+      พบผู้ป่วย <span class="font-semibold text-slate-700">{{ rows|length }}</span> ราย
+      รวมการประเมิน <span class="font-semibold text-slate-700">{{ total_records }}</span> ครั้ง
+      {% if start and end %}ระหว่างวันที่ {{ start }} ถึง {{ end }}
+      {% elif start %}ตั้งแต่วันที่ {{ start }} เป็นต้นไป
+      {% elif end %}จนถึงวันที่ {{ end }}{% endif %}
+    </p>
+  {% endif %}
 
   <div class="bg-white rounded-2xl border-2 border-slate-200 overflow-hidden shadow-sm">
     <div class="overflow-x-auto">
@@ -43,7 +65,11 @@
           <tr>
             <td colspan="5" class="px-6 py-12 text-center text-slate-400">
               <div class="flex flex-col items-center justify-center gap-2">
-                <p>ยังไม่มีประวัติการประเมินผู้ป่วย</p>
+                {% if has_filter %}
+                  <p>ไม่พบประวัติการประเมินตามเงื่อนไขที่เลือก</p>
+                {% else %}
+                  <p>ยังไม่มีประวัติการประเมินผู้ป่วย</p>
+                {% endif %}
               </div>
             </td>
           </tr>
