@@ -23,10 +23,20 @@
               <p class="font-semibold text-slate-800 text-sm">{{ p.full_name }}</p>
               <p class="text-xs text-slate-400 mt-0.5">{{ p.hn }} · เคยประเมินแล้ว {{ p.records.count }} ครั้ง</p>
             </div>
-            <a href="{% url 'assess' p.patient_id %}"
-               class="bg-sky-600 text-white px-4 py-2 rounded-lg text-xs font-semibold hover:bg-sky-700 transition text-center">
-              จำแนกผู้ป่วยนี้
-            </a>
+            <div class="flex items-center gap-2 shrink-0">
+              <a href="{% url 'patient_edit' p.patient_id %}"
+                 class="border-2 border-slate-300 bg-white text-slate-600 px-3 py-2 rounded-lg text-xs font-semibold hover:bg-slate-50 hover:text-sky-600 transition">
+                ✏️ แก้ไข
+              </a>
+              <a href="{% url 'patient_delete' p.patient_id %}"
+                 class="border-2 border-slate-300 bg-white text-slate-600 px-3 py-2 rounded-lg text-xs font-semibold hover:bg-rose-50 hover:text-rose-600 hover:border-rose-300 transition">
+                🗑️ ลบ
+              </a>
+              <a href="{% url 'assess' p.patient_id %}"
+                 class="bg-sky-600 text-white px-4 py-2 rounded-lg text-xs font-semibold hover:bg-sky-700 transition text-center">
+                จำแนกผู้ป่วยนี้
+              </a>
+            </div>
           </div>
         {% empty %}
           <p class="text-sm text-slate-400 text-center py-4">ไม่พบผู้ป่วยที่ตรงกับคำค้นหา</p>

@@ -1,0 +1,74 @@
+{% extends "mywebapp/base.html" %}
+{% block content %}
+<section class="max-w-md mx-auto w-full px-4 sm:px-6 py-8 sm:py-12">
+  <a href="{% url 'dashboard' %}?q={{ patient.hn }}" class="inline-flex items-center gap-1.5 text-sm text-slate-500 hover:text-sky-600 transition font-medium mb-4">
+    ← กลับไปค้นหา
+  </a>
+
+  <div class="bg-white rounded-2xl border-2 border-slate-200 p-6 shadow-sm">
+    <h1 class="font-bold text-2xl text-slate-800 mb-1">แก้ไขข้อมูลผู้ป่วย</h1>
+    <p class="text-sm text-slate-500 mb-6">
+      {% if patient.has_demographics %}
+        ผู้ป่วยรายนี้เคยประเมินแล้ว {{ record_count }} ครั้ง
+      {% else %}
+        ผู้ป่วยรายนี้ยังไม่เคยประเมิน
+      {% endif %}
+    </p>
+
+    <form method="post" class="space-y-4">
+      {% csrf_token %}
+
+      <div>
+        <label class="block text-xs font-semibold text-slate-500 tracking-wider uppercase mb-1.5">ชื่อ-นามสกุลผู้ป่วย</label>
+        {{ form.full_name }}
+        {% if form.full_name.errors %}<p class="text-xs text-rose-500 mt-1.5">🚨 {{ form.full_name.errors.0 }}</p>{% endif %}
+      </div>
+
+      <div>
+        <label class="block text-xs font-semibold text-slate-500 tracking-wider uppercase mb-1.5">รหัส HN</label>
+        {{ form.hn }}
+        {% if form.hn.errors %}
+          <p class="text-xs text-rose-500 mt-1.5">🚨 {{ form.hn.errors.0 }}</p>
+        {% else %}
+          <p class="text-xs text-slate-400 mt-1.5">รูปแบบ: HN ตามด้วยตัวเลข 9 หลัก เช่น HN123456789</p>
+        {% endif %}
+      </div>
+
+      {% if patient.has_demographics %}
+        <div class="border-t-2 border-slate-100 pt-4 space-y-4">
+          <p class="text-xs text-amber-600 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2 leading-relaxed">
+            ⓘ เพศ อายุ และกลุ่มอายุ เป็นข้อมูลที่แบบจำลองใช้ในการจำแนก
+            หากแก้ไข ระบบจะประมวลผลการประเมินเดิมทั้ง {{ record_count }} รายการใหม่โดยอัตโนมัติ
+          </p>
+
+          <div>
+            <label class="block text-xs font-semibold text-slate-500 tracking-wider uppercase mb-1.5">เพศ</label>
+            {{ form.gender }}
+            {% if form.gender.errors %}<p class="text-xs text-rose-500 mt-1.5">🚨 {{ form.gender.errors.0 }}</p>{% endif %}
+          </div>
+
+          <div>
+            <label class="block text-xs font-semibold text-slate-500 tracking-wider uppercase mb-1.5">อายุ (ปี)</label>
+            {{ form.age }}
+            {% if form.age.errors %}<p class="text-xs text-rose-500 mt-1.5">🚨 {{ form.age.errors.0 }}</p>{% endif %}
+          </div>
+
+          <div>
+            <label class="block text-xs font-semibold text-slate-500 tracking-wider uppercase mb-1.5">กลุ่มอายุ</label>
+            {{ form.age_group }}
+            {% if form.age_group.errors %}<p class="text-xs text-rose-500 mt-1.5">🚨 {{ form.age_group.errors.0 }}</p>{% endif %}
+          </div>
+        </div>
+      {% endif %}
+
+      <button type="submit" class="w-full bg-sky-600 text-white py-3 rounded-xl text-sm font-semibold hover:bg-sky-700 transition shadow-md shadow-sky-100">
+        บันทึกการแก้ไข
+      </button>
+      <a href="{% url 'dashboard' %}?q={{ patient.hn }}"
+         class="block text-center border-2 border-slate-300 bg-white text-slate-700 py-3 rounded-xl text-sm font-semibold hover:bg-slate-50 transition">
+        ยกเลิก
+      </a>
+    </form>
+  </div>
+</section>
+{% endblock %}

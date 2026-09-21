@@ -36,6 +36,45 @@ class PatientDemographicForm(forms.ModelForm):
         }
 
 
+class PatientEditForm(forms.ModelForm):
+    """
+    แก้ไขข้อมูลผู้ป่วย — ชื่อและรหัส HN แก้ได้เสมอ
+    ส่วนเพศ/อายุ/กลุ่มอายุ จะแสดงเฉพาะผู้ป่วยที่เคยประเมินแล้ว เพราะยังไม่เคยกรอกมาก่อน
+    """
+    class Meta:
+        model = Patient
+        fields = ["full_name", "hn", "gender", "age", "age_group"]
+        widgets = {
+            "full_name": forms.TextInput(attrs={"class": "form-input", "placeholder": "ชื่อ-นามสกุลผู้ป่วย"}),
+            "hn":        forms.TextInput(attrs={"class": "form-input", "maxlength": 11}),
+            "gender":    forms.Select(attrs={"class": "form-input"}),
+            "age":       forms.NumberInput(attrs={"min": 1, "max": 100, "class": "form-input"}),
+            "age_group": forms.Select(attrs={"class": "form-input"}),
+        }
+
+    DEMOGRAPHIC_FIELDS = ("gender", "age", "age_group")
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        if self.instance.has_demographics:
+            for name in self.DEMOGRAPHIC_FIELDS:
+                self.fields[name].required = True
+        else:
+            for name in self.DEMOGRAPHIC_FIELDS:
+                del self.fields[name]
+
+    def clean_hn(self):
+        hn = self.cleaned_data["hn"].strip().upper()
+        if Patient.objects.filter(hn=hn).exclude(pk=self.instance.pk).exists():
+            raise forms.ValidationError("รหัส HN นี้เป็นของผู้ป่วยรายอื่นในระบบแล้ว กรุณาตรวจสอบอีกครั้ง")
+        return hn
+
+    @property
+    def demographics_changed(self):
+        """True ถ้าแก้ค่าที่แบบจำลองใช้ ซึ่งทำให้ผลการประเมินเดิมต้องประมวลผลใหม่"""
+        return any(name in self.changed_data for name in self.DEMOGRAPHIC_FIELDS)
+
+
 class AssessmentForm(forms.ModelForm):
     """กรอกทุกครั้งที่ประเมิน — แอตทริบิวต์ที่เปลี่ยนได้ในแต่ละครั้ง"""
     class Meta:

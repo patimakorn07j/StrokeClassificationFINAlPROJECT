@@ -2,10 +2,14 @@ from functools import wraps
 
 from django.contrib import messages
 from django.shortcuts import render, redirect, get_object_or_404
+from django.urls import reverse
 from django.db.models import Q
 
 from .models import Staff, Patient, PredictionRecord, Recommendation
-from .forms import LoginForm, PatientRegisterForm, PatientDemographicForm, AssessmentForm
+from .forms import (
+    LoginForm, PatientRegisterForm, PatientDemographicForm,
+    PatientEditForm, AssessmentForm,
+)
 from .classifier import classify_patient
 
 
@@ -85,6 +89,84 @@ def patient_register_view(request):
         form = PatientRegisterForm(initial={"full_name": initial_name})
 
     return render(request, "mywebapp/patient_register.html", {"form": form})
+
+
+def _search_url(patient):
+    """กลับไปหน้าค้นหาพร้อมคำค้นเดิม เพื่อให้เห็นการ์ดของผู้ป่วยรายนั้นทันที"""
+    return f"{reverse('dashboard')}?q={patient.hn}"
+
+
+def _record_to_features(record):
+    """รวมข้อมูลผู้ป่วยกับแบบประเมินที่บันทึกไว้แล้ว ให้อยู่ในรูปที่ classify_patient ต้องการ"""
+    return {
+        "gender":          record.patient.gender,
+        "age":             record.patient.age,
+        "age_group":       record.patient.age_group,
+        "patient_type":    record.patient_type,
+        "referral_reason": record.referral_reason,
+        "is_receive":      record.is_receive,
+        "is_referboard":   record.is_referboard,
+        "f_face":          record.f_face,
+        "a_arm":           record.a_arm,
+        "s_speech":        record.s_speech,
+    }
+
+
+# ---------------------------------------------------------------------------
+# แก้ไขข้อมูลผู้ป่วย — ถ้าแก้เพศ/อายุ/กลุ่มอายุ ซึ่งเป็นค่าที่แบบจำลองใช้
+# ต้องประมวลผลการประเมินเดิมของผู้ป่วยรายนั้นใหม่ทั้งหมด ผลลัพธ์จึงจะตรงกับข้อมูลล่าสุด
+# ---------------------------------------------------------------------------
+@login_required
+def patient_edit_view(request, patient_id):
+    patient = get_object_or_404(Patient, pk=patient_id)
+
+    if request.method == "POST":
+        form = PatientEditForm(request.POST, instance=patient)
+        if form.is_valid():
+            rerun = form.demographics_changed
+            patient = form.save()
+
+            recomputed = 0
+            if rerun:
+                for record in patient.records.all():
+                    record.result = classify_patient(_record_to_features(record))
+                    record.save(update_fields=["result", "updated_at"])
+                    recomputed += 1
+
+            if recomputed:
+                messages.success(
+                    request,
+                    f"แก้ไขข้อมูลผู้ป่วยสำเร็จ และประมวลผลการประเมินเดิมใหม่ {recomputed} รายการ",
+                )
+            else:
+                messages.success(request, "แก้ไขข้อมูลผู้ป่วยสำเร็จ")
+            return redirect(_search_url(patient))
+    else:
+        form = PatientEditForm(instance=patient)
+
+    return render(request, "mywebapp/patient_edit.html", {
+        "form": form, "patient": patient, "record_count": patient.records.count(),
+    })
+
+
+# ---------------------------------------------------------------------------
+# ลบผู้ป่วย — อนุญาตเฉพาะรายที่ยังไม่มีผลการประเมิน
+# เพราะการลบผู้ป่วยจะลบผลการประเมินของเจ้าหน้าที่ทุกคนที่เคยประเมินรายนั้นไปด้วย
+# ---------------------------------------------------------------------------
+@login_required
+def patient_delete_view(request, patient_id):
+    patient = get_object_or_404(Patient, pk=patient_id)
+    record_count = patient.records.count()
+
+    if record_count == 0 and request.method == "POST" and request.POST.get("confirm") == "1":
+        hn = patient.hn
+        patient.delete()
+        messages.success(request, f"ลบผู้ป่วยรหัส {hn} ออกจากระบบเรียบร้อยแล้ว")
+        return redirect("dashboard")
+
+    return render(request, "mywebapp/patient_delete_confirm.html", {
+        "patient": patient, "record_count": record_count,
+    })
 
 
 # ---------------------------------------------------------------------------
