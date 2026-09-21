@@ -1,8 +1,8 @@
 {% extends "mywebapp/base.html" %}
 {% block content %}
 <section class="max-w-md mx-auto w-full px-4 sm:px-6 py-8 sm:py-12">
-  <a href="{% url 'dashboard' %}?q={{ patient.hn }}" class="inline-flex items-center gap-1.5 text-sm text-slate-500 hover:text-sky-600 transition font-medium mb-4">
-    ← กลับไปค้นหา
+  <a href="{{ back_url }}" class="inline-flex items-center gap-1.5 text-sm text-slate-500 hover:text-sky-600 transition font-medium mb-4">
+    ← {% if next_qs %}กลับไปหน้าประเมิน{% else %}กลับไปค้นหา{% endif %}
   </a>
 
   <div class="bg-white rounded-2xl border-2 border-slate-200 p-6 shadow-sm">
@@ -64,7 +64,7 @@
       <button type="submit" class="w-full bg-sky-600 text-white py-3 rounded-xl text-sm font-semibold hover:bg-sky-700 transition shadow-md shadow-sky-100">
         บันทึกการแก้ไข
       </button>
-      <a href="{% url 'dashboard' %}?q={{ patient.hn }}"
+      <a href="{{ back_url }}"
          class="block text-center border-2 border-slate-300 bg-white text-slate-700 py-3 rounded-xl text-sm font-semibold hover:bg-slate-50 transition">
         ยกเลิก
       </a>

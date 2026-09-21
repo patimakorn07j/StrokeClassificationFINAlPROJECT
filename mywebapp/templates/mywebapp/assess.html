@@ -9,6 +9,13 @@
     <p class="text-sm text-slate-500 mt-1.5">
       {{ patient.full_name }} · รหัส {{ patient.hn }}
     </p>
+    <p class="flex flex-wrap items-center gap-x-3 gap-y-1 mt-2">
+      <span class="text-xs text-slate-400">กรอกชื่อหรือรหัสผิด?</span>
+      <a href="{% url 'patient_edit' patient.patient_id %}?next=assess"
+         class="text-xs font-semibold text-sky-600 hover:text-sky-700 transition">✏️ แก้ไขข้อมูลผู้ป่วย</a>
+      <a href="{% url 'patient_delete' patient.patient_id %}?next=assess"
+         class="text-xs font-semibold text-rose-500 hover:text-rose-600 transition">🗑️ ลบผู้ป่วยรายนี้</a>
+    </p>
     {% if not first_time %}
       <p class="text-xs text-amber-600 bg-amber-50 border border-amber-200 rounded-lg px-3 py-1.5 mt-2 inline-block">
         ⓘ ใช้ข้อมูลเพศ/อายุ/กลุ่มอายุเดิม ({{ patient.get_gender_display }}, {{ patient.age }} ปี, {{ patient.get_age_group_display }})

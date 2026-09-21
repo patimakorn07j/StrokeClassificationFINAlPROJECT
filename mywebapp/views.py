@@ -91,8 +91,18 @@ def patient_register_view(request):
     return render(request, "mywebapp/patient_register.html", {"form": form})
 
 
-def _search_url(patient):
-    """กลับไปหน้าค้นหาพร้อมคำค้นเดิม เพื่อให้เห็นการ์ดของผู้ป่วยรายนั้นทันที"""
+def _next_qs(request):
+    """ส่งต่อปลายทางเดิมไปกับลิงก์ยกเลิก เพื่อให้กดยกเลิกแล้วกลับไปหน้าที่กดเข้ามา"""
+    return "?next=assess" if request.GET.get("next") == "assess" else ""
+
+
+def _return_url(request, patient):
+    """
+    กลับไปหน้าที่กดเข้ามา — ถ้ามาจากหน้าประเมินให้กลับไปหน้าประเมินของผู้ป่วยรายนั้น
+    ถ้าไม่ใช่ก็กลับไปหน้าค้นหาพร้อมคำค้นเดิม เพื่อให้เห็นการ์ดของผู้ป่วยรายนั้นทันที
+    """
+    if request.GET.get("next") == "assess":
+        return reverse("assess", args=[patient.patient_id])
     return f"{reverse('dashboard')}?q={patient.hn}"
 
 
@@ -140,12 +150,13 @@ def patient_edit_view(request, patient_id):
                 )
             else:
                 messages.success(request, "แก้ไขข้อมูลผู้ป่วยสำเร็จ")
-            return redirect(_search_url(patient))
+            return redirect(_return_url(request, patient))
     else:
         form = PatientEditForm(instance=patient)
 
     return render(request, "mywebapp/patient_edit.html", {
         "form": form, "patient": patient, "record_count": patient.records.count(),
+        "back_url": _return_url(request, patient), "next_qs": _next_qs(request),
     })
 
 
@@ -166,6 +177,7 @@ def patient_delete_view(request, patient_id):
 
     return render(request, "mywebapp/patient_delete_confirm.html", {
         "patient": patient, "record_count": record_count,
+        "back_url": _return_url(request, patient), "next_qs": _next_qs(request),
     })
 
 
