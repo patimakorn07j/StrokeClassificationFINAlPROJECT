@@ -30,6 +30,8 @@
   }
   select,input[type="number"],input[type="text"],input[type="password"],input[type="date"]{font-size:1rem!important}
   .custom-shadow{box-shadow:0 4px 6px -1px rgb(0 0 0/.02),0 2px 4px -2px rgb(0 0 0/.02),0 0 0 1px rgb(0 0 0/.02)}
+  /* เงาบาง ๆ ใต้แถบบน ให้แยกออกจากพื้นหน้าเว็บที่เป็นสีอ่อนใกล้กัน */
+  .header-shadow{box-shadow:0 1px 3px rgb(15 23 42/.07),0 4px 12px -4px rgb(15 23 42/.05)}
   .form-input {
     width: 100%; border: 2px solid #cbd5e1; border-radius: 0.75rem;
     padding: 0.65rem 0.85rem; font-size: 1rem; outline: none;
@@ -41,7 +43,7 @@
 </head>
 <body class="min-h-screen flex flex-col bg-slate-50">
 
-<header class="bg-white border-b border-slate-100 sticky top-0 z-50 backdrop-blur-md bg-white/90">
+<header class="bg-white border-b border-slate-200 header-shadow sticky top-0 z-50 backdrop-blur-md bg-white/90">
   <div class="max-w-6xl mx-auto px-4 sm:px-6 py-3 sm:py-4 flex flex-wrap items-center justify-between gap-y-2">
     <a href="{% url 'index' %}" class="flex items-center gap-2 sm:gap-3 group">
       <span class="inline-flex h-8 w-8 sm:h-10 sm:w-10 items-center justify-center rounded-xl bg-sky-500 text-white font-semibold text-base sm:text-lg shadow-md shadow-sky-200 group-hover:scale-105 transition duration-200">S</span>
