@@ -1,53 +1,195 @@
 {% extends "mywebapp/base.html" %}
 {% block content %}
 
-<section class="max-w-6xl mx-auto w-full px-4 sm:px-6 pt-10 sm:pt-16 pb-12 sm:pb-16 grid md:grid-cols-2 gap-10 md:gap-14 items-center">
-  <div>
-    <span class="inline-flex items-center text-xs font-semibold tracking-wide text-sky-600 bg-sky-50 px-3 py-1.5 rounded-full border border-sky-100">
-      ระบบสนับสนุนการคัดกรองทางแพทย์เบื้องต้น
-    </span>
+<!-- ══════════ ส่วนเปิดหน้า ══════════ -->
+<section class="max-w-4xl mx-auto w-full px-4 sm:px-6 pt-12 sm:pt-20 pb-10 sm:pb-14 text-center">
+  <span class="inline-flex items-center text-xs font-semibold tracking-wide text-sky-600 bg-sky-50 px-3 py-1.5 rounded-full border border-sky-100">
+    ระบบสนับสนุนการคัดกรองทางการแพทย์เบื้องต้น
+  </span>
 
-    <h1 class="font-bold text-3xl sm:text-4xl md:text-5xl text-slate-800 mt-5">
-      จำแนกโรคหลอดเลือดสมอง<br><span class="text-sky-600">ได้เร็วขึ้น แม่นยำขึ้น</span>
-    </h1>
+  <h1 class="font-bold text-3xl sm:text-4xl md:text-5xl text-slate-800 mt-5">
+    รู้ทันโรคหลอดเลือดสมอง<br><span class="text-sky-600">คัดกรองได้เร็วขึ้น</span>
+  </h1>
 
-    <p class="text-[15px] leading-relaxed text-slate-500 max-w-md mt-5">
-      กรอกข้อมูลผู้ป่วยตามเกณฑ์ FAST และข้อมูลทางสถิติทั่วไป ระบบ AI จะช่วยวิเคราะห์ความเสี่ยงแนวโน้ม Stroke / Non-Stroke
-    </p>
+  <p class="text-[15px] sm:text-base leading-relaxed text-slate-500 max-w-2xl mx-auto mt-5">
+    โรคหลอดเลือดสมองเป็นภาวะฉุกเฉินที่ทุกนาทีมีความหมาย
+    ระบบนี้พัฒนาขึ้นเพื่อช่วยเจ้าหน้าที่คัดกรองผู้ป่วยที่มีแนวโน้มเป็นโรคหลอดเลือดสมองได้รวดเร็วขึ้น
+    ด้วยการวิเคราะห์อาการร่วมกับข้อมูลพื้นฐานของผู้ป่วยผ่านแบบจำลองการเรียนรู้ของเครื่อง
+  </p>
 
-    <div class="mt-8">
-      <a href="{% url 'login' %}"
-         class="inline-flex w-full sm:w-auto items-center justify-center gap-2 bg-sky-600 text-white px-7 py-3.5 rounded-xl text-sm font-semibold hover:bg-sky-700 transition shadow-md shadow-sky-100">
-        เข้าสู่ระบบเจ้าหน้าที่
-      </a>
-    </div>
+  <p class="text-xs text-slate-400 mt-6">
+    สำหรับเจ้าหน้าที่ผู้ได้รับสิทธิ์เท่านั้น เข้าสู่ระบบได้ที่แถบด้านบนขวา
+  </p>
+</section>
 
-    <p class="flex items-start gap-2 text-xs text-slate-400 max-w-md mt-5">
-      <span>บัญชีผู้ใช้งานเจ้าหน้าที่จัดการโดยผู้ดูแลระบบ กรุณาติดต่อผู้ดูแลระบบเพื่อขอสิทธิ์เข้าใช้งาน</span>
+<!-- ══════════ สัญญาณเตือน FAST ══════════ -->
+<section class="max-w-6xl mx-auto w-full px-4 sm:px-6 py-10 sm:py-14">
+  <div class="text-center mb-8 sm:mb-10">
+    <h2 class="font-bold text-2xl sm:text-3xl text-slate-800">สัญญาณเตือน FAST</h2>
+    <p class="text-sm text-slate-500 mt-2 max-w-2xl mx-auto">
+      หลักสังเกตอาการที่องค์กรด้านโรคหลอดเลือดสมองทั่วโลกใช้ร่วมกัน
+      หากพบเพียงข้อใดข้อหนึ่ง ให้สงสัยไว้ก่อนว่าอาจเป็นโรคหลอดเลือดสมอง
     </p>
   </div>
 
-  <div class="bg-white rounded-2xl p-6 sm:p-7 border border-slate-100 custom-shadow">
-    <p class="font-bold text-slate-800 text-base mb-1">เกณฑ์ประเมินอาการเบื้องต้น</p>
-    <p class="text-xs text-slate-400 mb-6">สังเกต 4 สัญญาณอันตรายที่ต้องระวังอย่างใกล้ชิด</p>
-    <div class="grid gap-4">
-      <div class="flex items-center gap-4 p-3 rounded-xl hover:bg-slate-50 transition">
-        <span class="h-11 w-11 shrink-0 rounded-xl bg-rose-50 text-rose-500 font-bold flex items-center justify-center text-lg border border-rose-100">F</span>
-        <div><p class="text-sm font-semibold text-slate-700">Face</p><p class="text-xs text-slate-400 mt-0.5">หน้าเบี้ยว มุมปากตก</p></div>
+  <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
+    <div class="bg-white rounded-2xl border-2 border-slate-200 p-5 sm:p-6 custom-shadow">
+      <span class="inline-flex h-12 w-12 items-center justify-center rounded-xl bg-rose-50 text-rose-500 font-bold text-xl border-2 border-rose-100">F</span>
+      <p class="font-semibold text-base text-slate-800 mt-4">Face — หน้าเบี้ยว</p>
+      <p class="text-sm text-slate-500 mt-1.5 leading-relaxed">
+        ใบหน้าซีกใดซีกหนึ่งอ่อนแรง มุมปากตก ให้ลองบอกให้ผู้ป่วยยิ้มหรือยิงฟัน
+        แล้วสังเกตว่าใบหน้าสองข้างเท่ากันหรือไม่
+      </p>
+    </div>
+
+    <div class="bg-white rounded-2xl border-2 border-slate-200 p-5 sm:p-6 custom-shadow">
+      <span class="inline-flex h-12 w-12 items-center justify-center rounded-xl bg-rose-50 text-rose-500 font-bold text-xl border-2 border-rose-100">A</span>
+      <p class="font-semibold text-base text-slate-800 mt-4">Arm — แขนขาอ่อนแรง</p>
+      <p class="text-sm text-slate-500 mt-1.5 leading-relaxed">
+        แขนหรือขาข้างใดข้างหนึ่งอ่อนแรงหรือชา ให้ลองยกแขนทั้งสองข้างขึ้นพร้อมกัน
+        แล้วสังเกตว่ามีข้างใดตกลงมาเองหรือไม่
+      </p>
+    </div>
+
+    <div class="bg-white rounded-2xl border-2 border-slate-200 p-5 sm:p-6 custom-shadow">
+      <span class="inline-flex h-12 w-12 items-center justify-center rounded-xl bg-rose-50 text-rose-500 font-bold text-xl border-2 border-rose-100">S</span>
+      <p class="font-semibold text-base text-slate-800 mt-4">Speech — พูดไม่ชัด</p>
+      <p class="text-sm text-slate-500 mt-1.5 leading-relaxed">
+        พูดไม่ชัด พูดลำบาก นึกคำไม่ออก หรือฟังไม่เข้าใจ
+        ให้ลองบอกให้ผู้ป่วยพูดประโยคสั้น ๆ ตามแล้วฟังว่าชัดเจนหรือไม่
+      </p>
+    </div>
+
+    <div class="bg-white rounded-2xl border-2 border-sky-200 bg-sky-50/40 p-5 sm:p-6 custom-shadow">
+      <span class="inline-flex h-12 w-12 items-center justify-center rounded-xl bg-white text-sky-600 font-bold text-xl border-2 border-sky-200">T</span>
+      <p class="font-semibold text-base text-slate-800 mt-4">Time — รีบพบแพทย์</p>
+      <p class="text-sm text-slate-600 mt-1.5 leading-relaxed">
+        จดเวลาที่เริ่มมีอาการให้แม่นยำ แล้วนำส่งโรงพยาบาลทันที
+        อย่ารอดูอาการ เพราะการรักษาที่ได้ผลดีที่สุดต้องเริ่มภายในเวลาจำกัด
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════ เวลาคือสมอง ══════════ -->
+<section class="max-w-6xl mx-auto w-full px-4 sm:px-6 pb-10 sm:pb-14">
+  <div class="rounded-2xl border-2 border-rose-200 bg-rose-50/60 p-6 sm:p-8">
+    <div class="grid md:grid-cols-3 gap-6 sm:gap-8 items-center">
+      <div class="md:col-span-2">
+        <h2 class="font-bold text-xl sm:text-2xl text-rose-700">ทุกนาทีคือเนื้อสมอง</h2>
+        <p class="text-sm text-slate-600 mt-3 leading-relaxed">
+          เมื่อหลอดเลือดสมองตีบหรืออุดตัน เซลล์สมองจะเริ่มตายลงอย่างรวดเร็วในทุกนาทีที่ผ่านไป
+          ยาละลายลิ่มเลือดซึ่งเป็นการรักษาที่ได้ผลดีที่สุดสำหรับผู้ป่วยกลุ่มนี้
+          ต้องให้ภายใน <span class="font-semibold text-rose-700">4.5 ชั่วโมง</span> นับจากเวลาที่เริ่มมีอาการ
+          ผู้ป่วยที่มาถึงโรงพยาบาลช้ากว่านั้นจะเสียโอกาสในการรักษาด้วยวิธีนี้
+        </p>
+        <p class="text-sm text-slate-600 mt-3 leading-relaxed">
+          ด้วยเหตุนี้ การคัดกรองที่รวดเร็วและการส่งต่อที่ทันเวลาจึงมีผลโดยตรงต่อโอกาสรอดชีวิต
+          และระดับความพิการที่จะเหลืออยู่หลังการรักษา
+        </p>
       </div>
-      <div class="flex items-center gap-4 p-3 rounded-xl hover:bg-slate-50 transition">
-        <span class="h-11 w-11 shrink-0 rounded-xl bg-rose-50 text-rose-500 font-bold flex items-center justify-center text-lg border border-rose-100">A</span>
-        <div><p class="text-sm font-semibold text-slate-700">Arm</p><p class="text-xs text-slate-400 mt-0.5">แขนขาอ่อนแรงข้างใดข้างหนึ่ง</p></div>
-      </div>
-      <div class="flex items-center gap-4 p-3 rounded-xl hover:bg-slate-50 transition">
-        <span class="h-11 w-11 shrink-0 rounded-xl bg-rose-50 text-rose-500 font-bold flex items-center justify-center text-lg border border-rose-100">S</span>
-        <div><p class="text-sm font-semibold text-slate-700">Speech</p><p class="text-xs text-slate-400 mt-0.5">พูดไม่ชัด พูดอ้อแอ้</p></div>
-      </div>
-      <div class="flex items-center gap-4 p-3 rounded-xl hover:bg-slate-50 transition">
-        <span class="h-11 w-11 shrink-0 rounded-xl bg-sky-50 text-sky-500 font-bold flex items-center justify-center text-lg border border-sky-100">T</span>
-        <div><p class="text-sm font-semibold text-slate-700">Time</p><p class="text-xs text-slate-400 mt-0.5">เริ่มมีอาการมาไม่เกิน 4.5 ชั่วโมง</p></div>
+      <div class="bg-white rounded-2xl border-2 border-rose-200 p-5 text-center">
+        <p class="text-xs font-semibold text-slate-500 tracking-wider uppercase">สายด่วนการแพทย์ฉุกเฉิน</p>
+        <p class="font-bold text-4xl text-rose-600 mt-2">1669</p>
+        <p class="text-xs text-slate-500 mt-2 leading-relaxed">โทรฟรีตลอด 24 ชั่วโมง เมื่อสงสัยว่าเป็นโรคหลอดเลือดสมอง</p>
       </div>
     </div>
+  </div>
+</section>
+
+<!-- ══════════ ความรู้เพิ่มเติม ══════════ -->
+<section class="max-w-6xl mx-auto w-full px-4 sm:px-6 pb-10 sm:pb-14">
+  <div class="grid md:grid-cols-2 gap-4 sm:gap-5">
+
+    <div class="bg-white rounded-2xl border-2 border-slate-200 p-5 sm:p-6 custom-shadow">
+      <p class="font-semibold text-lg text-slate-800">โรคหลอดเลือดสมองคืออะไร</p>
+      <p class="text-sm text-slate-500 mt-2 leading-relaxed">
+        คือภาวะที่เลือดไปเลี้ยงสมองผิดปกติจนเนื้อสมองได้รับความเสียหาย แบ่งได้เป็น 2 ชนิดหลัก
+      </p>
+      <div class="mt-4 space-y-3">
+        <div class="rounded-xl border-2 border-slate-100 bg-slate-50/60 px-4 py-3">
+          <p class="font-semibold text-sm text-slate-700">ชนิดตีบหรืออุดตัน</p>
+          <p class="text-xs text-slate-500 mt-1 leading-relaxed">
+            เกิดจากลิ่มเลือดหรือไขมันอุดกั้นหลอดเลือด ทำให้เลือดไปเลี้ยงสมองไม่พอ เป็นชนิดที่พบบ่อยที่สุด
+          </p>
+        </div>
+        <div class="rounded-xl border-2 border-slate-100 bg-slate-50/60 px-4 py-3">
+          <p class="font-semibold text-sm text-slate-700">ชนิดหลอดเลือดแตก</p>
+          <p class="text-xs text-slate-500 mt-1 leading-relaxed">
+            หลอดเลือดในสมองปริแตกจนมีเลือดออกกดเบียดเนื้อสมอง มักสัมพันธ์กับภาวะความดันโลหิตสูงที่ควบคุมไม่ได้
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <div class="bg-white rounded-2xl border-2 border-slate-200 p-5 sm:p-6 custom-shadow">
+      <p class="font-semibold text-lg text-slate-800">ปัจจัยเสี่ยงที่ควรเฝ้าระวัง</p>
+      <p class="text-sm text-slate-500 mt-2 leading-relaxed">
+        ปัจจัยเหล่านี้ส่วนใหญ่ควบคุมได้ด้วยการดูแลสุขภาพและการรักษาอย่างต่อเนื่อง
+      </p>
+      <div class="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-2">
+        <p class="text-sm text-slate-600 rounded-lg bg-slate-50 border border-slate-100 px-3 py-2">ความดันโลหิตสูง</p>
+        <p class="text-sm text-slate-600 rounded-lg bg-slate-50 border border-slate-100 px-3 py-2">โรคเบาหวาน</p>
+        <p class="text-sm text-slate-600 rounded-lg bg-slate-50 border border-slate-100 px-3 py-2">ไขมันในเลือดสูง</p>
+        <p class="text-sm text-slate-600 rounded-lg bg-slate-50 border border-slate-100 px-3 py-2">ภาวะหัวใจเต้นผิดจังหวะ</p>
+        <p class="text-sm text-slate-600 rounded-lg bg-slate-50 border border-slate-100 px-3 py-2">การสูบบุหรี่</p>
+        <p class="text-sm text-slate-600 rounded-lg bg-slate-50 border border-slate-100 px-3 py-2">การดื่มแอลกอฮอล์</p>
+        <p class="text-sm text-slate-600 rounded-lg bg-slate-50 border border-slate-100 px-3 py-2">ภาวะน้ำหนักเกิน</p>
+        <p class="text-sm text-slate-600 rounded-lg bg-slate-50 border border-slate-100 px-3 py-2">ขาดการออกกำลังกาย</p>
+      </div>
+      <p class="text-xs text-slate-400 mt-4 leading-relaxed">
+        ผู้สูงอายุมีความเสี่ยงสูงกว่าวัยอื่น แต่โรคนี้เกิดกับคนวัยทำงานได้เช่นกัน
+      </p>
+    </div>
+
+  </div>
+</section>
+
+<!-- ══════════ เกี่ยวกับระบบ ══════════ -->
+<section class="max-w-6xl mx-auto w-full px-4 sm:px-6 pb-12 sm:pb-16">
+  <div class="text-center mb-8 sm:mb-10">
+    <h2 class="font-bold text-2xl sm:text-3xl text-slate-800">ระบบนี้ทำงานอย่างไร</h2>
+    <p class="text-sm text-slate-500 mt-2 max-w-2xl mx-auto">
+      เจ้าหน้าที่บันทึกข้อมูลผู้ป่วยผ่านหน้าเว็บ ระบบจะประมวลผลด้วยแบบจำลองที่ผ่านการฝึกสอนแล้ว
+      และแสดงผลการคัดกรองพร้อมคำแนะนำในการเตรียมรับมือ
+    </p>
+  </div>
+
+  <div class="grid sm:grid-cols-3 gap-4 sm:gap-5">
+    <div class="bg-white rounded-2xl border-2 border-slate-200 p-5 sm:p-6 custom-shadow">
+      <span class="inline-flex h-9 w-9 items-center justify-center rounded-lg bg-sky-50 text-sky-600 font-bold text-sm border-2 border-sky-100">1</span>
+      <p class="font-semibold text-base text-slate-800 mt-4">บันทึกข้อมูลผู้ป่วย</p>
+      <p class="text-sm text-slate-500 mt-1.5 leading-relaxed">
+        กรอกข้อมูลพื้นฐาน ได้แก่ เพศ อายุ กลุ่มอายุ ข้อมูลการรับบริการ
+        และอาการตามเกณฑ์ FAS คือหน้าเบี้ยว แขนขาอ่อนแรง และพูดไม่ชัด
+      </p>
+    </div>
+    <div class="bg-white rounded-2xl border-2 border-slate-200 p-5 sm:p-6 custom-shadow">
+      <span class="inline-flex h-9 w-9 items-center justify-center rounded-lg bg-sky-50 text-sky-600 font-bold text-sm border-2 border-sky-100">2</span>
+      <p class="font-semibold text-base text-slate-800 mt-4">ประมวลผลด้วยแบบจำลอง</p>
+      <p class="text-sm text-slate-500 mt-1.5 leading-relaxed">
+        ระบบส่งข้อมูลเข้าแบบจำลอง AdaBoost ซึ่งผ่านการเปรียบเทียบประสิทธิภาพ
+        กับเทคนิคการเรียนรู้ของเครื่องอื่นแล้วคัดเลือกมาใช้งาน
+      </p>
+    </div>
+    <div class="bg-white rounded-2xl border-2 border-slate-200 p-5 sm:p-6 custom-shadow">
+      <span class="inline-flex h-9 w-9 items-center justify-center rounded-lg bg-sky-50 text-sky-600 font-bold text-sm border-2 border-sky-100">3</span>
+      <p class="font-semibold text-base text-slate-800 mt-4">แสดงผลและบันทึกประวัติ</p>
+      <p class="text-sm text-slate-500 mt-1.5 leading-relaxed">
+        แสดงผลว่ามีแนวโน้มเป็นหรือไม่เป็นโรค พร้อมคำแนะนำในการเตรียมรับมือเบื้องต้น
+        และเก็บเป็นประวัติให้เรียกดูย้อนหลังได้
+      </p>
+    </div>
+  </div>
+
+  <div class="rounded-2xl border-2 border-amber-200 bg-amber-50/60 px-5 py-4 mt-5">
+    <p class="text-sm text-amber-800 leading-relaxed">
+      <span class="font-semibold">ข้อควรทราบ</span> —
+      ผลที่ได้จากระบบเป็นเพียงเครื่องมือช่วยคัดกรองเบื้องต้น ไม่ใช่การวินิจฉัยทางการแพทย์
+      การตัดสินใจขั้นสุดท้ายเป็นดุลยพินิจของแพทย์ผู้เชี่ยวชาญเสมอ
+      ทั้งนี้ข้อ T ของเกณฑ์ FAST คือระยะเวลาที่เริ่มมีอาการ เป็นข้อมูลที่เจ้าหน้าที่ใช้ประกอบการตัดสินใจส่งต่อ
+      แต่ไม่ได้ถูกนำเข้าแบบจำลอง เนื่องจากไม่ผ่านเกณฑ์การคัดเลือกคุณลักษณะในขั้นตอนพัฒนาแบบจำลอง
+    </p>
   </div>
 </section>
 
