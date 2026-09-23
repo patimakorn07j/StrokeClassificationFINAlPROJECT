@@ -244,7 +244,6 @@ def _parse_date(value):
 
 @login_required
 def history_view(request):
-    staff = get_current_staff(request)
     q = request.GET.get("q", "").strip()
     start = _parse_date(request.GET.get("start", ""))
     end = _parse_date(request.GET.get("end", ""))
@@ -253,7 +252,8 @@ def history_view(request):
     if start and end and start > end:
         start, end = end, start
 
-    records = PredictionRecord.objects.filter(staff=staff)
+    # เจ้าหน้าที่ทุกคนใช้ข้อมูลชุดเดียวกัน จึงไม่กรองตามผู้บันทึก
+    records = PredictionRecord.objects.all()
     if start:
         records = records.filter(assessed_at__date__gte=start)
     if end:
@@ -270,7 +270,8 @@ def history_view(request):
         # นับเฉพาะการประเมินที่อยู่ในช่วงวันที่ที่เลือก ตัวเลขในตารางจึงตรงกับตัวกรองเสมอ
         in_range = records.filter(patient=p)
         last = in_range.order_by("-assessed_at").first()
-        rows.append({"patient": p, "count": in_range.count(), "last_assessed": last.assessed_at})
+        rows.append({"patient": p, "count": in_range.count(),
+                     "last_assessed": last.assessed_at, "last_staff": last.staff})
     rows.sort(key=lambda r: r["last_assessed"], reverse=True)
 
     return render(request, "mywebapp/history.html", {
@@ -287,10 +288,9 @@ def history_view(request):
 # ---------------------------------------------------------------------------
 @login_required
 def patient_history_view(request, patient_id):
-    staff = get_current_staff(request)
     patient = get_object_or_404(Patient, pk=patient_id)
 
-    records = list(PredictionRecord.objects.filter(patient=patient, staff=staff).order_by("assessed_at"))
+    records = list(PredictionRecord.objects.filter(patient=patient).order_by("assessed_at"))
     for i, r in enumerate(records, 1):
         r.seq = i
     records.reverse()
@@ -300,16 +300,14 @@ def patient_history_view(request, patient_id):
 
 @login_required
 def record_detail_view(request, record_id):
-    staff = get_current_staff(request)
-    record = get_object_or_404(PredictionRecord, pk=record_id, staff=staff)
+    record = get_object_or_404(PredictionRecord, pk=record_id)
     recommendation = Recommendation.objects.filter(result_type=record.result).first()
     return render(request, "mywebapp/record_detail.html", {"record": record, "recommendation": recommendation})
 
 
 @login_required
 def edit_record_view(request, record_id):
-    staff = get_current_staff(request)
-    record = get_object_or_404(PredictionRecord, pk=record_id, staff=staff)
+    record = get_object_or_404(PredictionRecord, pk=record_id)
 
     if request.method == "POST":
         form = AssessmentForm(request.POST, instance=record)
@@ -336,8 +334,7 @@ def edit_record_view(request, record_id):
 # ---------------------------------------------------------------------------
 @login_required
 def delete_record_view(request, record_id):
-    staff = get_current_staff(request)
-    record = get_object_or_404(PredictionRecord, pk=record_id, staff=staff)
+    record = get_object_or_404(PredictionRecord, pk=record_id)
 
     if request.method == "POST" and request.POST.get("confirm") == "1":
         patient_id = record.patient_id
