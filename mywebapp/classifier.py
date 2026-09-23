@@ -24,17 +24,34 @@ from django.conf import settings
 # ---------------------------------------------------------------------------
 MODEL_DIR = os.path.join(settings.BASE_DIR, "ml_models")
 
+def _log(message):
+    """
+    พิมพ์สถานะโดยไม่ให้โปรแกรมล้ม ถ้าหน้าจอ ConsoLe เข้ารหัสภาษาไทยไม่ได้
+    เช่น cmd.exe ที่ใช้ code page อื่นที่ไม่ใช่ UTF-8
+    """
+    try:
+        print(message)
+    except UnicodeEncodeError:
+        print(message.encode("ascii", "backslashreplace").decode("ascii"))
+
+
 try:
     _model    = joblib.load(os.path.join(MODEL_DIR, "adaboost_model.pkl"))
     _scaler   = joblib.load(os.path.join(MODEL_DIR, "scaler.pkl"))
     _encoders = joblib.load(os.path.join(MODEL_DIR, "encoders.pkl"))
     _features = joblib.load(os.path.join(MODEL_DIR, "features.pkl"))
     MODEL_LOADED = True
-    print(f"[classifier] โหลดโมเดลสำเร็จ | Features: {_features}")
+    _LOAD_ERROR = None
 except Exception as e:
     _model = _scaler = _encoders = _features = None
     MODEL_LOADED = False
-    print(f"[classifier] โหลดโมเดลไม่สำเร็จ: {e}")
+    _LOAD_ERROR = e
+
+# แจ้งสถานะนอก try เสมอ เพื่อไม่ให้ข้อผิดพลาดของการพิมพ์ถูกเข้าใจว่าโหลดโมเดลไม่สำเร็จ
+if MODEL_LOADED:
+    _log(f"[classifier] โหลดโมเดลสำเร็จ | Features: {_features}")
+else:
+    _log(f"[classifier] โหลดโมเดลไม่สำเร็จ: {_LOAD_ERROR}")
 
 
 # ---------------------------------------------------------------------------
