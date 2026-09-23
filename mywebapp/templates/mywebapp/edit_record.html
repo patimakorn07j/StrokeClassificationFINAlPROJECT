@@ -1,9 +1,7 @@
 {% extends "mywebapp/base.html" %}
 {% block content %}
 <section class="max-w-3xl mx-auto w-full px-4 sm:px-6 py-8 sm:py-12">
-  <a href="{% url 'record_detail' record.record_id %}" class="inline-flex items-center gap-1.5 text-sm text-slate-500 hover:text-sky-600 transition font-medium mb-4">
-    ยกเลิกการแก้ไข
-  </a>
+  <a href="{% url 'record_detail' record.record_id %}" class="inline-flex items-center justify-center border-2 border-slate-300 bg-white text-slate-700 px-4 py-2 rounded-xl text-sm font-semibold hover:bg-slate-50 hover:border-slate-400 transition shadow-sm mb-4">ยกเลิกการแก้ไข</a>
   <h1 class="font-bold text-2xl sm:text-3xl text-slate-800 mb-1">แก้ไขข้อมูลการประเมิน</h1>
   <p class="text-sm text-slate-500 mb-6">{{ record.patient.full_name }} · รหัส {{ record.patient.hn }}</p>
 
